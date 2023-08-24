@@ -10,6 +10,7 @@ public class LoginTest extends BaseWebTest {
             username = "bear_ber",
             password = "12345"
     )
+
     @Test
     void mainPageShouldBeVisibleAfterLogin(AuthUserEntity user) {
         loginPage

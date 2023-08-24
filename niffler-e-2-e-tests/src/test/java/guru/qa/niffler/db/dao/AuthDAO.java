@@ -12,9 +12,9 @@ public interface AuthDAO {
 
     int createUserInAuth(AuthUserEntity user);
 
-    void updateUserInAuth(AuthUserEntity authUserEntity);
+    AuthUserEntity updateUser(AuthUserEntity user);
 
-    AuthUserEntity getUserByIdFromAuth(UUID userId);
+    void deleteUserById(UUID userId);
 
-    void deleteUserByIdInAuth(UUID userId);
+    AuthUserEntity getUserById(UUID userId);
 }
