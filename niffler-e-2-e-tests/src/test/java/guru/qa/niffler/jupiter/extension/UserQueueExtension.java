@@ -21,6 +21,7 @@ public class UserQueueExtension implements BeforeEachCallback, AfterTestExecutio
 
     static {
         Queue<UserJson> usersWithFriends = new ConcurrentLinkedQueue<>();
+
         usersWithFriends.add(bindUser("dima", "123456"));
         usersWithFriends.add(bindUser("barsik", "12345"));
         usersQueue.put(User.UserType.WITH_FRIENDS, usersWithFriends);
@@ -38,6 +39,7 @@ public class UserQueueExtension implements BeforeEachCallback, AfterTestExecutio
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
+
         List<Method> methods = new ArrayList<>();
         methods.add(context.getRequiredTestMethod());
 
@@ -54,6 +56,7 @@ public class UserQueueExtension implements BeforeEachCallback, AfterTestExecutio
 
     @Override
     public void afterTestExecution(ExtensionContext context) throws Exception {
+
         Map<User.UserType, UserJson> candidatesForTest = context.getStore(NAMESPACE).get(getAllureId(context), Map.class);
         candidatesForTest.forEach((userType, userJson) -> {
             Queue<UserJson> userQueue = usersQueue.get(userType);
@@ -71,6 +74,7 @@ public class UserQueueExtension implements BeforeEachCallback, AfterTestExecutio
 
     @Override
     public UserJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+
         User.UserType userType = parameterContext.getParameter().getAnnotation(User.class).userType();
         return (UserJson) extensionContext.getStore(NAMESPACE).get(getAllureId(extensionContext), Map.class).get(userType);
     }

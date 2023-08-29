@@ -18,6 +18,7 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 import static guru.qa.niffler.jupiter.annotation.User.UserType.WITH_FRIENDS;
+
 @Isolated
 public class SpendingWebTest extends BaseWebTest {
     private static final String user = "dima";

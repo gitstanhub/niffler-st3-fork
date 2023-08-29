@@ -44,7 +44,6 @@ public abstract class JpaService {
         EntityTransaction transaction = em.getTransaction();
 
         transaction.begin();
-
         try {
             T result = action.apply(em);
             transaction.commit();
