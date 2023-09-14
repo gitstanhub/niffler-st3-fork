@@ -29,7 +29,7 @@ public class SpendExtension implements BeforeEachCallback, ParameterResolver {
             spend.setSpendDate(new Date());
             spend.setCurrency(annotation.currency());
             SpendJson createdSpend = spendService.addSpend(spend);
-            context.getStore(NAMESPACE).put("spend", createdSpend);
+            context.getStore(NAMESPACE).put(context.getUniqueId(), createdSpend);
         }
     }
 
@@ -44,6 +44,6 @@ public class SpendExtension implements BeforeEachCallback, ParameterResolver {
     public SpendJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return extensionContext
                 .getStore(SpendExtension.NAMESPACE)
-                .get("spend", SpendJson.class);
+                .get(extensionContext.getUniqueId(), SpendJson.class);
     }
 }

@@ -1,6 +1,7 @@
 package guru.qa.niffler.test;
 
 import com.codeborne.selenide.Selenide;
+import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.Spend;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CurrencyValues;
@@ -27,11 +28,16 @@ public class SpendingWebTest extends BaseWebTest {
     @BeforeEach
     void doLogin(@User(userType = WITH_FRIENDS) UserJson userForTest) {
         WelcomePage welcomePage = Selenide.open("http://127.0.0.1:3000/main", WelcomePage.class);
+        welcomePage.goToLoginPage();
         $("input[name='username']").setValue(userForTest.getUsername());
         $("input[name='password']").setValue(userForTest.getPassword());
         $("button[type='submit']").click();
     }
 
+    @Category(
+            username = user,
+            category = "Рыбалка"
+    )
     @Spend(
             username = user,
             description = "Рыбалка на Ладоге",
@@ -46,8 +52,7 @@ public class SpendingWebTest extends BaseWebTest {
         $(".spendings__content tbody")
                 .$$("tr")
                 .find(text(createdSpend.getDescription()))
-                .$$("td")
-                .first()
+                .$("td")
                 .scrollTo()
                 .click();
 
