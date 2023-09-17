@@ -58,8 +58,8 @@ public class SpendingWebTest extends BaseWebTest {
 
         Allure.step(
                 "Delete spending",
-                () -> $(byText("Delete selected")).click())
-        ;
+                () -> $(byText("Delete selected")).click()
+        );
 
         Allure.step(
                 "Check spendings",

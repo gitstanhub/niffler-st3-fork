@@ -8,15 +8,17 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 public class CategoryExtension implements BeforeEachCallback {
 
-    public static ExtensionContext.Namespace NAMESPACE;
+    public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
 
     private SpendServiceClient spendServiceClient = new SpendServiceClient();
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
         Category annotation = extensionContext.getRequiredTestMethod().getAnnotation(Category.class);
+
         if (annotation != null) {
             CategoryJson category = new CategoryJson();
+
             category.setCategory(annotation.category());
             category.setUsername(annotation.username());
 
