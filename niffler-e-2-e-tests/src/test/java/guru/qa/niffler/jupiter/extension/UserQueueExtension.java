@@ -6,8 +6,6 @@ import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.*;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -17,8 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback, AfterTestExecutionCallback, ParameterResolver {
 
     public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(UserQueueExtension.class);
-
-    private static boolean beforeEachMethodsUserAnnotated;
+    private static final Object BEFORE_EACH_ANNOTATED_KEY = new Object();
 
     private static Map<User.UserType, Queue<UserJson>> usersQueue = new ConcurrentHashMap<>();
 
@@ -46,29 +43,32 @@ public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback
                 .filter(method -> method.isAnnotationPresent(User.class))
                 .toList();
 
-        beforeEachMethodsUserAnnotated = !beforeEachMethodsWithUser.isEmpty();
+        boolean beforeEachMethodsUserAnnotated = !beforeEachMethodsWithUser.isEmpty();
+        context.getStore(NAMESPACE).put(BEFORE_EACH_ANNOTATED_KEY, beforeEachMethodsUserAnnotated);
     }
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         boolean testMethodUserAnnotated = context.getRequiredTestMethod().isAnnotationPresent(User.class);
+        boolean beforeEachMethodsUserAnnotated = (boolean) context.getStore(NAMESPACE).get(BEFORE_EACH_ANNOTATED_KEY);
 
-        List<Method> handleMethods = new ArrayList<>();
-        List<Parameter> handleParameters = new ArrayList<>();
+        if (beforeEachMethodsUserAnnotated || testMethodUserAnnotated) {
+            List<Method> handleMethods = new ArrayList<>();
+            List<Parameter> handleParameters;
+            Map<User.UserType, UserJson> candidatesForTest;
 
-        if (beforeEachMethodsUserAnnotated && testMethodUserAnnotated) {
-            handleMethods = addHandleMethods(context);
+            if (testMethodUserAnnotated) {
+                handleMethods.add(context.getRequiredTestMethod());
+            }
+
+            Arrays.stream(context.getRequiredTestClass().getDeclaredMethods())
+                    .filter(method -> method.isAnnotationPresent(BeforeEach.class))
+                    .forEach(handleMethods::add);
+
             handleParameters = addHandledParameters(handleMethods);
-
-
-        } else if (beforeEachMethodsUserAnnotated && !testMethodUserAnnotated) {
-
-        } else if (!beforeEachMethodsUserAnnotated && testMethodUserAnnotated) {
-
-        } else {
-
+            candidatesForTest = addCandidatesForTest(handleParameters);
+            putCandidatesForTestToContext(context, candidatesForTest);
         }
-
     }
 
     @Override
@@ -85,7 +85,8 @@ public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback
 
     @Override
     public UserJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return extensionContext.getStore(NAMESPACE).get(getAllureId(extensionContext), UserJson.class);
+        User.UserType userType = parameterContext.getParameter().getAnnotation(User.class).userType();
+        return (UserJson) extensionContext.getStore(NAMESPACE).get(getAllureId(extensionContext), Map.class).get(userType);
     }
 
     private String getAllureId(ExtensionContext context) {
@@ -103,18 +104,6 @@ public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback
         return user;
     }
 
-    private List<Method> addHandleMethods(ExtensionContext context) {
-        List<Method> handleMethods = new ArrayList<>();
-
-        handleMethods.add(context.getRequiredTestMethod());
-
-        Arrays.stream(context.getRequiredTestClass().getDeclaredMethods())
-                .filter(method -> method.isAnnotationPresent(BeforeEach.class))
-                .forEach(handleMethods::add);
-
-        return handleMethods;
-    }
-
     private List<Parameter> addHandledParameters(List<Method> handleMethods) {
         return handleMethods.stream()
                 .map(Method::getParameters)
@@ -124,7 +113,7 @@ public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback
                 .toList();
     }
 
-    private void putUsersToContext(ExtensionContext context, List<Parameter> handleParameters) {
+    private Map<User.UserType, UserJson> addCandidatesForTest(List<Parameter> handleParameters) {
         Map<User.UserType, UserJson> candidatesForTest = new ConcurrentHashMap<>();
 
         for (Parameter parameter : handleParameters) {
@@ -142,8 +131,12 @@ public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback
             candidateForTest.setUserType(userType);
 
             candidatesForTest.put(userType, candidateForTest);
-
-            context.getStore(NAMESPACE).put(getAllureId(context), candidatesForTest);
         }
+
+        return candidatesForTest;
+    }
+
+    private void putCandidatesForTestToContext(ExtensionContext context, Map<User.UserType, UserJson> candidatesForTest) {
+        context.getStore(NAMESPACE).put(getAllureId(context), candidatesForTest);
     }
 }
