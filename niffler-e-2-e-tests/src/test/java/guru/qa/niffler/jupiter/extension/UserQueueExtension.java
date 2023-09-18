@@ -40,7 +40,7 @@ public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback
     public void beforeAll(ExtensionContext context) throws Exception {
         List<Method> beforeEachMethodsWithUser = Arrays.stream(context.getRequiredTestClass().getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(BeforeEach.class))
-                .filter(method -> method.isAnnotationPresent(User.class))
+                .filter(method -> Arrays.stream(method.getParameters()).anyMatch(parameter -> parameter.isAnnotationPresent(User.class)))
                 .toList();
 
         boolean beforeEachMethodsUserAnnotated = !beforeEachMethodsWithUser.isEmpty();
@@ -49,10 +49,13 @@ public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        boolean testMethodUserAnnotated = context.getRequiredTestMethod().isAnnotationPresent(User.class);
+        boolean testMethodUserAnnotated = Arrays.stream(context.getRequiredTestMethod().getParameters())
+                .anyMatch(parameter -> parameter.isAnnotationPresent(User.class));
+
         boolean beforeEachMethodsUserAnnotated = (boolean) context.getStore(NAMESPACE).get(BEFORE_EACH_ANNOTATED_KEY);
 
         if (beforeEachMethodsUserAnnotated || testMethodUserAnnotated) {
+            System.out.println("Test debug");
             List<Method> handleMethods = new ArrayList<>();
             List<Parameter> handleParameters;
             Map<User.UserType, UserJson> candidatesForTest;
@@ -73,8 +76,13 @@ public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback
 
     @Override
     public void afterTestExecution(ExtensionContext context) throws Exception {
-        UserJson userFromTest = context.getStore(NAMESPACE).get(getAllureId(context), UserJson.class);
-        usersQueue.get(userFromTest.getUserType()).add(userFromTest);
+        Map<User.UserType, UserJson> candidatesForTest = context.getStore(NAMESPACE).get(getAllureId(context), Map.class);
+        candidatesForTest.forEach((userType, userJson) -> {
+            Queue<UserJson> userQueue = usersQueue.get(userType);
+            if (userQueue != null) {
+                userQueue.add(userJson);
+            }
+        });
     }
 
     @Override
