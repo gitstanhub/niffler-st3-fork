@@ -55,7 +55,7 @@ public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback
         boolean beforeEachMethodsUserAnnotated = (boolean) context.getStore(NAMESPACE).get(BEFORE_EACH_ANNOTATED_KEY);
 
         if (beforeEachMethodsUserAnnotated || testMethodUserAnnotated) {
-            System.out.println("Test debug");
+            System.out.println("Test debug line: the code block inside if statement was reached");
             List<Method> handleMethods = new ArrayList<>();
             List<Parameter> handleParameters;
             Map<User.UserType, UserJson> candidatesForTest;
