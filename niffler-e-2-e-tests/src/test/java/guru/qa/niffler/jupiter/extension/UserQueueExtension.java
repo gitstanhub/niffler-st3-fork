@@ -11,17 +11,17 @@ import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeoutException;
 
-public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback, AfterTestExecutionCallback, ParameterResolver {
+public class UserQueueExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
 
     public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(UserQueueExtension.class);
-    private static final Object BEFORE_EACH_ANNOTATED_KEY = new Object();
 
     private static Map<User.UserType, Queue<UserJson>> usersQueue = new ConcurrentHashMap<>();
 
     static {
         Queue<UserJson> usersWithFriends = new ConcurrentLinkedQueue<>();
-        usersWithFriends.add(bindUser("dima", "12345"));
+        usersWithFriends.add(bindUser("dima", "123456"));
         usersWithFriends.add(bindUser("barsik", "12345"));
         usersQueue.put(User.UserType.WITH_FRIENDS, usersWithFriends);
 
@@ -37,41 +37,20 @@ public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback
     }
 
     @Override
-    public void beforeAll(ExtensionContext context) throws Exception {
-        List<Method> beforeEachMethodsWithUser = Arrays.stream(context.getRequiredTestClass().getDeclaredMethods())
-                .filter(method -> method.isAnnotationPresent(BeforeEach.class))
-                .filter(method -> Arrays.stream(method.getParameters()).anyMatch(parameter -> parameter.isAnnotationPresent(User.class)))
-                .toList();
-
-        boolean beforeEachMethodsUserAnnotated = !beforeEachMethodsWithUser.isEmpty();
-        context.getStore(NAMESPACE).put(BEFORE_EACH_ANNOTATED_KEY, beforeEachMethodsUserAnnotated);
-    }
-
-    @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        boolean testMethodUserAnnotated = Arrays.stream(context.getRequiredTestMethod().getParameters())
-                .anyMatch(parameter -> parameter.isAnnotationPresent(User.class));
 
-        boolean beforeEachMethodsUserAnnotated = (boolean) context.getStore(NAMESPACE).get(BEFORE_EACH_ANNOTATED_KEY);
+        List<Method> methods = new ArrayList<>();
+        methods.add(context.getRequiredTestMethod());
 
-        if (beforeEachMethodsUserAnnotated || testMethodUserAnnotated) {
-            System.out.println("Test debug line: the code block inside if statement was reached");
-            List<Method> handleMethods = new ArrayList<>();
-            List<Parameter> handleParameters;
-            Map<User.UserType, UserJson> candidatesForTest;
+        Arrays.stream(context.getRequiredTestClass().getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(BeforeEach.class))
+                .forEach(methods::add);
 
-            if (testMethodUserAnnotated) {
-                handleMethods.add(context.getRequiredTestMethod());
-            }
+        List<Parameter> parameters = addHandledParameters(methods);
 
-            Arrays.stream(context.getRequiredTestClass().getDeclaredMethods())
-                    .filter(method -> method.isAnnotationPresent(BeforeEach.class))
-                    .forEach(handleMethods::add);
+        Map<User.UserType, UserJson> candidatesForTest = addCandidatesForTest(parameters);
 
-            handleParameters = addHandledParameters(handleMethods);
-            candidatesForTest = addCandidatesForTest(handleParameters);
-            putCandidatesForTestToContext(context, candidatesForTest);
-        }
+        putCandidatesForTestToContext(context, candidatesForTest);
     }
 
     @Override
@@ -121,8 +100,10 @@ public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback
                 .toList();
     }
 
-    private Map<User.UserType, UserJson> addCandidatesForTest(List<Parameter> handleParameters) {
+    private Map<User.UserType, UserJson> addCandidatesForTest(List<Parameter> handleParameters) throws TimeoutException {
         Map<User.UserType, UserJson> candidatesForTest = new ConcurrentHashMap<>();
+
+        long timeout = System.currentTimeMillis() + 15000;
 
         for (Parameter parameter : handleParameters) {
 
@@ -133,6 +114,9 @@ public class UserQueueExtension implements BeforeEachCallback, BeforeAllCallback
             UserJson candidateForTest = null;
 
             while (candidateForTest == null) {
+                if (System.currentTimeMillis() > timeout) {
+                    throw new TimeoutException();
+                }
                 candidateForTest = usersQueueByType.poll();
             }
 
