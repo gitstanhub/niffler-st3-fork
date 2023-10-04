@@ -38,7 +38,6 @@ public class UserQueueExtension implements BeforeEachCallback, AfterTestExecutio
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-
         List<Method> methods = new ArrayList<>();
         methods.add(context.getRequiredTestMethod());
 
