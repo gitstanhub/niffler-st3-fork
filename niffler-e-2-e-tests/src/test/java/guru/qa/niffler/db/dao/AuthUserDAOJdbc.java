@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
+public class AuthUserDAOJdbc implements AuthUserDAO, UserDataDAO {
 
     private static DataSource authDs = DataSourceProvider.INSTANCE.getDataSource(ServiceDB.AUTH);
     private static DataSource userdataDs = DataSourceProvider.INSTANCE.getDataSource(ServiceDB.USERDATA);
@@ -75,7 +75,12 @@ public class AuthUserDAOJdbc implements AuthUserDAO, UserDataUserDAO {
 
     @Override
     public void deleteUserById(UUID userId) {
-
+        try (Connection connection = userdataDs.getConnection()) {
+            System.out.println();
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

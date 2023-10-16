@@ -2,7 +2,7 @@ package guru.qa.niffler.test;
 
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.db.dao.AuthUserDAO;
-import guru.qa.niffler.db.dao.UserDataUserDAO;
+import guru.qa.niffler.db.dao.UserDataDAO;
 import guru.qa.niffler.db.model.Authority;
 import guru.qa.niffler.db.model.AuthorityEntity;
 import guru.qa.niffler.db.model.UserEntity;
@@ -24,7 +24,7 @@ public class LoginTest extends BaseWebTest {
     @Dao
     private AuthUserDAO authUserDAO;
     @Dao
-    private UserDataUserDAO userDataUserDAO;
+    private UserDataDAO userDataDAO;
     private UserEntity user;
 
     @BeforeEach
@@ -43,12 +43,12 @@ public class LoginTest extends BaseWebTest {
                     return ae;
                 }).toList());
         authUserDAO.createUser(user);
-        userDataUserDAO.createUserInUserData(user);
+        userDataDAO.createUserInUserData(user);
     }
 
     @AfterEach
     void deleteUser() {
-        userDataUserDAO.deleteUserByIdInUserData(user.getId());
+        userDataDAO.deleteUserByIdInUserData(user.getId());
         authUserDAO.deleteUserById(user.getId());
 
     }
