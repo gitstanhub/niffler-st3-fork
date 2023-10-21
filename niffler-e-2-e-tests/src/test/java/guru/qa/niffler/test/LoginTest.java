@@ -1,11 +1,11 @@
 package guru.qa.niffler.test;
 
 import com.codeborne.selenide.Selenide;
-import guru.qa.niffler.db.dao.AuthUserDAO;
+import guru.qa.niffler.db.dao.AuthDAO;
 import guru.qa.niffler.db.dao.UserDataDAO;
 import guru.qa.niffler.db.model.Authority;
-import guru.qa.niffler.db.model.AuthorityEntity;
-import guru.qa.niffler.db.model.UserEntity;
+import guru.qa.niffler.db.model.AuthAuthorityEntity;
+import guru.qa.niffler.db.model.AuthUserEntity;
 import guru.qa.niffler.jupiter.annotation.Dao;
 import guru.qa.niffler.jupiter.extension.DaoExtension;
 import org.junit.jupiter.api.AfterEach;
@@ -22,14 +22,14 @@ import static com.codeborne.selenide.Selenide.$;
 public class LoginTest extends BaseWebTest {
 
     @Dao
-    private AuthUserDAO authUserDAO;
+    private AuthDAO authDAO;
     @Dao
     private UserDataDAO userDataDAO;
-    private UserEntity user;
+    private AuthUserEntity user;
 
     @BeforeEach
     void createUser() {
-        user = new UserEntity();
+        user = new AuthUserEntity();
         user.setUsername("valentin_2");
         user.setPassword("12345");
         user.setEnabled(true);
@@ -38,18 +38,18 @@ public class LoginTest extends BaseWebTest {
         user.setCredentialsNonExpired(true);
         user.setAuthorities(Arrays.stream(Authority.values())
                 .map(a -> {
-                    AuthorityEntity ae = new AuthorityEntity();
+                    AuthAuthorityEntity ae = new AuthAuthorityEntity();
                     ae.setAuthority(a);
                     return ae;
                 }).toList());
-        authUserDAO.createUser(user);
+        authDAO.createUserInAuth(user);
         userDataDAO.createUserInUserData(user);
     }
 
     @AfterEach
     void deleteUser() {
         userDataDAO.deleteUserByIdInUserData(user.getId());
-        authUserDAO.deleteUserById(user.getId());
+        authDAO.deleteUserByIdInAuth(user.getId());
 
     }
 
