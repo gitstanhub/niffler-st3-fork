@@ -11,7 +11,7 @@ public interface UserDataDAO {
 
     void updateUserInUserData(UserDataUserEntity user);
 
-    AuthUserEntity getUserByIdFromUserData(UUID userId);
+    UserDataUserEntity getUserByIdFromUserData(UUID userId);
 
     void deleteUserByIdInUserData(UUID userId);
 }

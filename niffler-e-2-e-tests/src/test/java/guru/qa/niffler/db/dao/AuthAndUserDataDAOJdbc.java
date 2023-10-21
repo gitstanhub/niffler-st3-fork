@@ -229,8 +229,35 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public AuthUserEntity getUserByIdFromUserData(UUID userId) {
+    public UserDataUserEntity getUserByIdFromUserData(UUID userId) {
+        UserDataUserEntity user = new UserDataUserEntity();
+        try (Connection connection = userdataDs.getConnection()) {
 
+            try (PreparedStatement userPs = connection.prepareStatement(
+                    "SELECT * FROM users WHERE id = ?"
+            )) {
+                userPs.setObject(1, userId);
+
+                userPs.execute();
+
+                ResultSet usersResultSet = userPs.getResultSet();
+
+                while (usersResultSet.next()) {
+                    user.setId(usersResultSet.getObject("id", UUID.class));
+                    user.setUsername(usersResultSet.getString("username"));
+                    user.setCurrency(usersResultSet.getString("currency"));
+                    user.setFirstName(usersResultSet.getString("firstname"));
+                    user.setSurname(usersResultSet.getString("surname"));
+                    user.setPhoto(usersResultSet.getBytes("photo"));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return user;
     }
 
     @Override
