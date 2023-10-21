@@ -262,6 +262,25 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
 
     @Override
     public void deleteUserByIdInUserData(UUID userId) {
+        try (Connection connection = userdataDs.getConnection()) {
 
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement userPs = connection.prepareStatement(
+                    "DELETE FROM users WHERE id = ?"
+            )) {
+                userPs.setObject(1, userId);
+
+                userPs.execute();
+
+                connection.commit();
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                connection.rollback();
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
