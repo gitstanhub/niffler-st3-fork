@@ -2,10 +2,7 @@ package guru.qa.niffler.db.dao;
 
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.ServiceDB;
-import guru.qa.niffler.db.model.Authority;
-import guru.qa.niffler.db.model.AuthAuthorityEntity;
-import guru.qa.niffler.db.model.CurrencyValues;
-import guru.qa.niffler.db.model.AuthUserEntity;
+import guru.qa.niffler.db.model.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -83,7 +80,8 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
 
             try (PreparedStatement userPs = connection.prepareStatement(
                     "UPDATE users SET username = ?, password = ?, enabled = ?, account_non_expired = ?, " +
-                            "account_non_locked = ?, credentials_non_expired = ?"
+                            "account_non_locked = ?, credentials_non_expired = ?" +
+                            "WHERE id = ?"
             )) {
                 userPs.setString(1, user.getUsername());
                 userPs.setString(2, pe.encode(user.getPassword()));
@@ -91,6 +89,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
                 userPs.setBoolean(4, user.getAccountNonExpired());
                 userPs.setBoolean(5, user.getAccountNonLocked());
                 userPs.setBoolean(6, user.getCredentialsNonExpired());
+                userPs.setObject(7, user.getId());
 
                 userPs.executeUpdate();
 
@@ -106,7 +105,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public AuthUserEntity getUserByIdInAuth(UUID userId) {
+    public AuthUserEntity getUserByIdFromAuth(UUID userId) {
         AuthUserEntity user = new AuthUserEntity();
         List<AuthAuthorityEntity> authAuthorityEntityList = new ArrayList<>();
 
@@ -178,15 +177,21 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     @Override
     public int createUserInUserData(AuthUserEntity user) {
         int createdRows = 0;
-        try (Connection conn = userdataDs.getConnection()) {
-            try (PreparedStatement usersPs = conn.prepareStatement(
-                    "INSERT INTO users (username, currency) " +
-                            "VALUES (?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = userdataDs.getConnection()) {
+            connection.setAutoCommit(false);
 
+            try (PreparedStatement usersPs = connection.prepareStatement(
+                    "INSERT INTO users (id, username, currency) " +
+                            "VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+                usersPs.setObject(1, user.getId());
                 usersPs.setString(1, user.getUsername());
                 usersPs.setString(2, CurrencyValues.RUB.name());
 
                 createdRows = usersPs.executeUpdate();
+            } catch (SQLException e) {
+                connection.rollback();
+                connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -196,12 +201,35 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void updateUserByIdInUserData(UUID userId) {
+    public void updateUserInUserData(UserDataUserEntity user) {
+        try (Connection connection = userdataDs.getConnection()) {
+            connection.setAutoCommit(false);
 
+            try (PreparedStatement usersPs = connection.prepareStatement(
+                    "UPDATE users SET username = ?, currency = ?, firstname = ?, surname = ?" +
+                            "WHERE id = ?"
+            )) {
+                usersPs.setString(1, user.getUsername());
+                usersPs.setString(2, user.getCurrency());
+                usersPs.setString(3, user.getFirstName());
+                usersPs.setString(4, user.getSurname());
+                usersPs.setObject(5, user.getId());
+
+                usersPs.executeUpdate();
+
+                connection.commit();
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                connection.rollback();
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public AuthUserEntity getUserByIdInUserData(UUID userId) {
+    public AuthUserEntity getUserByIdFromUserData(UUID userId) {
 
     }
 
