@@ -11,7 +11,7 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO {
     }
 
     @Override
-    public void updateUserByIdInAuth(UUID userId) {
+    public void updateUserInAuth(AuthUserEntity authUserEntity) {
     }
 
     @Override

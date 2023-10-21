@@ -77,8 +77,32 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public updateUserByIdInAuth(UUID userId) {
+    public void updateUserInAuth(AuthUserEntity user) {
+        try (Connection connection = authDs.getConnection()) {
+            connection.setAutoCommit(false);
 
+            try (PreparedStatement userPs = connection.prepareStatement(
+                    "UPDATE users SET username = ?, password = ?, enabled = ?, account_non_expired = ?, " +
+                            "account_non_locked = ?, credentials_non_expired = ?"
+            )) {
+                userPs.setString(1, user.getUsername());
+                userPs.setString(2, pe.encode(user.getPassword()));
+                userPs.setBoolean(3, user.getEnabled());
+                userPs.setBoolean(4, user.getAccountNonExpired());
+                userPs.setBoolean(5, user.getAccountNonLocked());
+                userPs.setBoolean(6, user.getCredentialsNonExpired());
+
+                userPs.executeUpdate();
+
+                connection.commit();
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                connection.rollback();
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -172,12 +196,12 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void updateUserByIdInAuth(UUID userId) {
+    public void updateUserByIdInUserData(UUID userId) {
 
     }
 
     @Override
-    public AuthUserEntity getUserByIdInAuth(UUID userId) {
+    public AuthUserEntity getUserByIdInUserData(UUID userId) {
 
     }
 
