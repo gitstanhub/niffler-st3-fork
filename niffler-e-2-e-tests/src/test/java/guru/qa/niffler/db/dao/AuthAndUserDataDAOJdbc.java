@@ -65,6 +65,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
             } catch (SQLException e) {
                 conn.rollback();
                 conn.setAutoCommit(true);
+                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -98,6 +99,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
             } catch (SQLException e) {
                 connection.rollback();
                 connection.setAutoCommit(true);
+                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -168,6 +170,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
             } catch (SQLException e) {
                 connection.rollback();
                 connection.setAutoCommit(true);
+                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -186,12 +189,13 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
 
                 usersPs.setObject(1, user.getId());
                 usersPs.setString(1, user.getUsername());
-                usersPs.setString(2, CurrencyValues.RUB.name());
+                usersPs.setString(2, CurrencyValues.EUR.name());
 
                 createdRows = usersPs.executeUpdate();
             } catch (SQLException e) {
                 connection.rollback();
                 connection.setAutoCommit(true);
+                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -222,6 +226,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
             } catch (SQLException e) {
                 connection.rollback();
                 connection.setAutoCommit(true);
+                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -250,8 +255,6 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
                     user.setSurname(usersResultSet.getString("surname"));
                     user.setPhoto(usersResultSet.getBytes("photo"));
                 }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -263,7 +266,6 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     @Override
     public void deleteUserByIdInUserData(UUID userId) {
         try (Connection connection = userdataDs.getConnection()) {
-
             connection.setAutoCommit(false);
 
             try (PreparedStatement userPs = connection.prepareStatement(
@@ -278,6 +280,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
             } catch (SQLException e) {
                 connection.rollback();
                 connection.setAutoCommit(true);
+                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
