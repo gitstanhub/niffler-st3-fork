@@ -7,10 +7,7 @@ import guru.qa.niffler.db.model.AuthUserEntity;
 import guru.qa.niffler.db.model.Authority;
 import guru.qa.niffler.jupiter.annotation.DBUser;
 import guru.qa.niffler.jupiter.annotation.Dao;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.*;
 
 import java.util.Arrays;
 
@@ -32,19 +29,33 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
             AuthUserEntity authUserEntity = createAuthUserEntity(dbUserAnnotation);
             authDao.createUserInAuth(authUserEntity);
             userDataDAO.createUserInUserData(authUserEntity);
-
-
+            extensionContext.getStore(NAMESPACE).put(extensionContext.getUniqueId(), authUserEntity);
         }
     }
 
     @Override
-
+    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+        return parameterContext.getParameter()
+                .getType()
+                .isAssignableFrom(AuthUserEntity.class) &&
+                extensionContext.getTestMethod().isPresent() &&
+                extensionContext.getTestMethod().get().isAnnotationPresent(DBUser.class);
+    }
 
     @Override
-
+    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+        return extensionContext.getStore(DBUserExtension.NAMESPACE)
+                .get(extensionContext.getUniqueId(), AuthUserEntity.class);
+    }
 
     @Override
+    public void afterEach(ExtensionContext extensionContext) throws Exception {
+        AuthUserEntity user = extensionContext.getStore(DBUserExtension.NAMESPACE)
+                .get(extensionContext.getUniqueId(), AuthUserEntity.class);
 
+        userDataDAO.deleteUserByIdInUserData(user.getId());
+        authDao.deleteUserByIdInAuth(user.getId());
+    }
 
     private AuthUserEntity createAuthUserEntity(DBUser dbUser) {
         AuthUserEntity authUserEntity = new AuthUserEntity();
