@@ -152,7 +152,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
 
     @Override
     public void deleteUserByIdInAuth(UUID userId) {
-        try (Connection connection = userdataDs.getConnection()) {
+        try (Connection connection = authDs.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement authorityPs = connection.prepareStatement(
@@ -188,8 +188,8 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
                             "VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
 
                 usersPs.setObject(1, user.getId());
-                usersPs.setString(1, user.getUsername());
-                usersPs.setString(2, CurrencyValues.EUR.name());
+                usersPs.setString(2, user.getUsername());
+                usersPs.setString(3, CurrencyValues.EUR.name());
 
                 createdRows = usersPs.executeUpdate();
             } catch (SQLException e) {

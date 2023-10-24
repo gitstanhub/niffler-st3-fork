@@ -6,6 +6,7 @@ import guru.qa.niffler.db.dao.UserDataDAO;
 import guru.qa.niffler.db.model.Authority;
 import guru.qa.niffler.db.model.AuthAuthorityEntity;
 import guru.qa.niffler.db.model.AuthUserEntity;
+import guru.qa.niffler.jupiter.annotation.DBUser;
 import guru.qa.niffler.jupiter.annotation.Dao;
 import guru.qa.niffler.jupiter.extension.DaoExtension;
 import org.junit.jupiter.api.AfterEach;
@@ -21,45 +22,55 @@ import static com.codeborne.selenide.Selenide.$;
 @ExtendWith(DaoExtension.class)
 public class LoginTest extends BaseWebTest {
 
-    @Dao
-    private AuthDAO authDAO;
-    @Dao
-    private UserDataDAO userDataDAO;
-    private AuthUserEntity user;
-
-    @BeforeEach
-    void createUser() {
-        user = new AuthUserEntity();
-        user.setUsername("valentin_2");
-        user.setPassword("12345");
-        user.setEnabled(true);
-        user.setAccountNonExpired(true);
-        user.setAccountNonLocked(true);
-        user.setCredentialsNonExpired(true);
-        user.setAuthorities(Arrays.stream(Authority.values())
-                .map(a -> {
-                    AuthAuthorityEntity ae = new AuthAuthorityEntity();
-                    ae.setAuthority(a);
-                    return ae;
-                }).toList());
-        authDAO.createUserInAuth(user);
-        userDataDAO.createUserInUserData(user);
-    }
-
-    @AfterEach
-    void deleteUser() {
-        userDataDAO.deleteUserByIdInUserData(user.getId());
-        authDAO.deleteUserByIdInAuth(user.getId());
-
-    }
-
+    @DBUser(
+            username = "stasershed",
+            password = "12345"
+    )
     @Test
-    void mainPageShouldBeVisibleAfterLogin() {
-        Selenide.open("http://127.0.0.1:3000/main");
-        $("a[href*='redirect']").click();
-        $("input[name='username']").setValue(user.getUsername());
-        $("input[name='password']").setValue(user.getPassword());
-        $("button[type='submit']").click();
+    void mainPageShouldBeVisibleAfterLogin(AuthUserEntity user) {
+        loginPage.logInWithUser(user);
         $(".main-content__section-stats").should(visible);
     }
+
+//    @Dao
+//    private AuthDAO authDAO;
+//    @Dao
+//    private UserDataDAO userDataDAO;
+//    private AuthUserEntity user;
+
+//    @BeforeEach
+//    void createUser() {
+//        user = new AuthUserEntity();
+//        user.setUsername("valentin_2");
+//        user.setPassword("12345");
+//        user.setEnabled(true);
+//        user.setAccountNonExpired(true);
+//        user.setAccountNonLocked(true);
+//        user.setCredentialsNonExpired(true);
+//        user.setAuthorities(Arrays.stream(Authority.values())
+//                .map(a -> {
+//                    AuthAuthorityEntity ae = new AuthAuthorityEntity();
+//                    ae.setAuthority(a);
+//                    return ae;
+//                }).toList());
+//        authDAO.createUserInAuth(user);
+//        userDataDAO.createUserInUserData(user);
+//    }
+
+//    @AfterEach
+//    void deleteUser() {
+//        userDataDAO.deleteUserByIdInUserData(user.getId());
+//        authDAO.deleteUserByIdInAuth(user.getId());
+//
+//    }
+
+//    @Test
+//    void mainPageShouldBeVisibleAfterLogin() {
+//        Selenide.open("http://127.0.0.1:3000/main");
+//        $("a[href*='redirect']").click();
+//        $("input[name='username']").setValue(user.getUsername());
+//        $("input[name='password']").setValue(user.getPassword());
+//        $("button[type='submit']").click();
+//        $(".main-content__section-stats").should(visible);
+//    }
 }

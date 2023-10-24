@@ -1,6 +1,7 @@
 package guru.qa.niffler.page;
 
 import com.codeborne.selenide.Selenide;
+import guru.qa.niffler.db.model.AuthUserEntity;
 import guru.qa.niffler.model.UserJson;
 import io.qameta.allure.Step;
 
@@ -16,9 +17,22 @@ public class LoginPage {
         return this;
     }
 
+    @Step
+    public LoginPage logInWithUser(AuthUserEntity user) {
+        open();
+        fillInForm(user);
+        clickSignInButton();
+        return this;
+    }
+
     private void open() {
         Selenide.open("http://127.0.0.1:3000/main");
         $("a[href*='redirect']").click();
+    }
+
+    private void fillInForm(AuthUserEntity user) {
+        $("input[name='username']").setValue(user.getUsername());
+        $("input[name='password']").setValue(user.getPassword());
     }
 
     private void fillInForm(UserJson userJson) {

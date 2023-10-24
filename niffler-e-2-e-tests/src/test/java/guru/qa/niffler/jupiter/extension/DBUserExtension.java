@@ -1,5 +1,6 @@
 package guru.qa.niffler.jupiter.extension;
 
+import guru.qa.niffler.db.dao.AuthAndUserDataDAOJdbc;
 import guru.qa.niffler.db.dao.AuthDAO;
 import guru.qa.niffler.db.dao.UserDataDAO;
 import guru.qa.niffler.db.model.AuthAuthorityEntity;
@@ -15,11 +16,15 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
 
     public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
 
-    @Dao
-    private AuthDAO authDao;
+//    @Dao
+//    private AuthDAO authDao;
+//
+//    @Dao
+//    private UserDataDAO userDataDAO;
 
-    @Dao
-    private UserDataDAO userDataDAO;
+        private static final AuthDAO authDao = new AuthAndUserDataDAOJdbc();
+        private static final UserDataDAO userDataDAO = new AuthAndUserDataDAOJdbc();
+
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
