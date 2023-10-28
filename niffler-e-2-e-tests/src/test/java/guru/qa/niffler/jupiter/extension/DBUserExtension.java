@@ -7,7 +7,6 @@ import guru.qa.niffler.db.model.AuthAuthorityEntity;
 import guru.qa.niffler.db.model.AuthUserEntity;
 import guru.qa.niffler.db.model.Authority;
 import guru.qa.niffler.jupiter.annotation.DBUser;
-import guru.qa.niffler.jupiter.annotation.Dao;
 import org.junit.jupiter.api.extension.*;
 
 import java.util.Arrays;
@@ -15,12 +14,6 @@ import java.util.Arrays;
 public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
     public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
-
-//    @Dao
-//    private AuthDAO authDao;
-//
-//    @Dao
-//    private UserDataDAO userDataDAO;
 
         private static final AuthDAO authDao = new AuthAndUserDataDAOJdbc();
         private static final UserDataDAO userDataDAO = new AuthAndUserDataDAOJdbc();
@@ -58,7 +51,7 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
         AuthUserEntity user = extensionContext.getStore(DBUserExtension.NAMESPACE)
                 .get(extensionContext.getUniqueId(), AuthUserEntity.class);
 
-        userDataDAO.deleteUserByIdInUserData(user.getId());
+        userDataDAO.deleteUserByUsernameInUserData(user.getUsername());
         authDao.deleteUserByIdInAuth(user.getId());
     }
 

@@ -184,14 +184,15 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
             connection.setAutoCommit(false);
 
             try (PreparedStatement usersPs = connection.prepareStatement(
-                    "INSERT INTO users (id, username, currency) " +
-                            "VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    "INSERT INTO users (username, currency) " +
+                            "VALUES (?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-                usersPs.setObject(1, user.getId());
-                usersPs.setString(2, user.getUsername());
-                usersPs.setString(3, CurrencyValues.EUR.name());
+                usersPs.setString(1, user.getUsername());
+                usersPs.setString(2, CurrencyValues.EUR.name());
 
                 createdRows = usersPs.executeUpdate();
+                connection.commit();
+                connection.setAutoCommit(true);
             } catch (SQLException e) {
                 connection.rollback();
                 connection.setAutoCommit(true);
@@ -234,14 +235,14 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public UserDataUserEntity getUserByIdFromUserData(UUID userId) {
+    public UserDataUserEntity getUserByUsernameFromUserData(String username) {
         UserDataUserEntity user = new UserDataUserEntity();
         try (Connection connection = userdataDs.getConnection()) {
 
             try (PreparedStatement userPs = connection.prepareStatement(
-                    "SELECT * FROM users WHERE id = ?"
+                    "SELECT * FROM users WHERE username = ?"
             )) {
-                userPs.setObject(1, userId);
+                userPs.setString(1, username);
 
                 userPs.execute();
 
@@ -264,14 +265,14 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void deleteUserByIdInUserData(UUID userId) {
+    public void deleteUserByUsernameInUserData(String username) {
         try (Connection connection = userdataDs.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement userPs = connection.prepareStatement(
-                    "DELETE FROM users WHERE id = ?"
+                    "DELETE FROM users WHERE username = ?"
             )) {
-                userPs.setObject(1, userId);
+                userPs.setString(1, username);
 
                 userPs.execute();
 

@@ -5,6 +5,7 @@ import guru.qa.niffler.db.model.AuthUserEntity;
 import guru.qa.niffler.model.UserJson;
 import io.qameta.allure.Step;
 
+import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 public class LoginPage {
@@ -23,6 +24,11 @@ public class LoginPage {
         fillInForm(user);
         clickSignInButton();
         return this;
+    }
+
+    @Step
+    public void verifyStatsSectionIsVisible() {
+        $(".main-content__section-stats").should(visible);
     }
 
     private void open() {
