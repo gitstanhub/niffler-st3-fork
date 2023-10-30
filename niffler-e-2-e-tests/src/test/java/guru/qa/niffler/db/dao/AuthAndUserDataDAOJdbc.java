@@ -80,17 +80,16 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
             connection.setAutoCommit(false);
 
             try (PreparedStatement userPs = connection.prepareStatement(
-                    "UPDATE users SET username = ?, password = ?, enabled = ?, account_non_expired = ?, " +
+                    "UPDATE users SET password = ?, enabled = ?, account_non_expired = ?, " +
                             "account_non_locked = ?, credentials_non_expired = ?" +
                             "WHERE id = ?"
             )) {
-                userPs.setString(1, user.getUsername());
-                userPs.setString(2, pe.encode(user.getPassword()));
-                userPs.setBoolean(3, user.getEnabled());
-                userPs.setBoolean(4, user.getAccountNonExpired());
-                userPs.setBoolean(5, user.getAccountNonLocked());
-                userPs.setBoolean(6, user.getCredentialsNonExpired());
-                userPs.setObject(7, user.getId());
+                userPs.setString(1, pe.encode(user.getPassword()));
+                userPs.setBoolean(2, user.getEnabled());
+                userPs.setBoolean(3, user.getAccountNonExpired());
+                userPs.setBoolean(4, user.getAccountNonLocked());
+                userPs.setBoolean(5, user.getCredentialsNonExpired());
+                userPs.setObject(6, user.getId());
 
                 userPs.executeUpdate();
 
@@ -211,14 +210,13 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
             connection.setAutoCommit(false);
 
             try (PreparedStatement usersPs = connection.prepareStatement(
-                    "UPDATE users SET username = ?, currency = ?, firstname = ?, surname = ?" +
+                    "UPDATE users SET currency = ?, firstname = ?, surname = ?" +
                             "WHERE id = ?"
             )) {
-                usersPs.setString(1, user.getUsername());
-                usersPs.setString(2, user.getCurrency());
-                usersPs.setString(3, user.getFirstName());
-                usersPs.setString(4, user.getSurname());
-                usersPs.setObject(5, user.getId());
+                usersPs.setString(1, user.getCurrency());
+                usersPs.setString(2, user.getFirstName());
+                usersPs.setString(3, user.getSurname());
+                usersPs.setObject(4, user.getId());
 
                 usersPs.executeUpdate();
 
