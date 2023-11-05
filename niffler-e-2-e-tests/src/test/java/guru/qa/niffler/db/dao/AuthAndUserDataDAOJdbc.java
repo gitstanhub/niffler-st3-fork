@@ -127,7 +127,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
                     user.setAccountNonLocked(usersResultSet.getBoolean("credentials_non_expired"));
 
                     try (PreparedStatement authorityPs = connection.prepareStatement(
-                            "SELECT * FROM where user_id = ?")) {
+                            "SELECT * FROM authorities where user_id = ?")) {
                         authorityPs.setObject(1, userId);
                         authorityPs.execute();
 
