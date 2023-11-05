@@ -103,7 +103,6 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
         return getUserByIdFromAuth(user.getId());
     }
 
