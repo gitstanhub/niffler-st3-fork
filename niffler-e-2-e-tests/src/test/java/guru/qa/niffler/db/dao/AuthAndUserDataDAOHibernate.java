@@ -11,7 +11,8 @@ public class AuthAndUserDataDAOHibernate implements AuthDAO {
     }
 
     @Override
-    public void updateUserInAuth(AuthUserEntity authUserEntity) {
+    public AuthUserEntity updateUserInAuth(AuthUserEntity user) {
+        return null;
     }
 
     @Override

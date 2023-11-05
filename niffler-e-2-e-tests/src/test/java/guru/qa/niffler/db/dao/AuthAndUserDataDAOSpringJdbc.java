@@ -3,8 +3,10 @@ package guru.qa.niffler.db.dao;
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.ServiceDB;
 import guru.qa.niffler.db.mapper.UserEntityRowMapper;
+import guru.qa.niffler.db.model.AuthUserEntity;
 import guru.qa.niffler.db.model.Authority;
 import guru.qa.niffler.db.model.CurrencyValues;
+import guru.qa.niffler.db.model.UserDataUserEntity;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -37,8 +39,7 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public int createUser(UserEntity user) {
+    public int createUserInAuth(AuthUserEntity user) {
         return authTtpl.execute(status -> {
             KeyHolder kh = new GeneratedKeyHolder();
 
@@ -71,17 +72,12 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user) {
+    public AuthUserEntity updateUserInAuth(AuthUserEntity user) {
         return null;
     }
 
     @Override
-    public void deleteUserById(UUID userId) {
-
-    }
-
-    @Override
-    public UserEntity getUserById(UUID userId) {
+    public AuthUserEntity getUserByIdFromAuth(UUID userId) {
         return authJdbcTemplate.queryForObject(
                 "SELECT * FROM users WHERE id = ? ",
                 UserEntityRowMapper.instance,
@@ -90,7 +86,12 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public int createUserInUserData(UserEntity user) {
+    public void deleteUserByIdInAuth(UUID userId) {
+
+    }
+
+    @Override
+    public int createUserInUserData(AuthUserEntity user) {
         return userdataJdbcTemplate.update(
                 "INSERT INTO users (username, currency) VALUES (?, ?)",
                 user.getUsername(),
@@ -99,8 +100,13 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void deleteUserByIdInUserData(UUID userId) {
-        userdataJdbcTemplate.update("DELETE FROM users WHERE id = ?", userId);
+    public void updateUserInUserData(UserDataUserEntity user) {
+
+    }
+
+    @Override
+    public UserDataUserEntity getUserByUsernameFromUserData(String username) {
+        return null;
     }
 
     @Override
