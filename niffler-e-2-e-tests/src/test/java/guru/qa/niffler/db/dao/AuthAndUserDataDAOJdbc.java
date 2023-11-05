@@ -75,7 +75,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void updateUserInAuth(AuthUserEntity user) {
+    public AuthUserEntity updateUserInAuth(AuthUserEntity user) {
         try (Connection connection = authDs.getConnection()) {
             connection.setAutoCommit(false);
 
@@ -103,6 +103,8 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        return getUserByIdFromAuth(user.getId());
     }
 
     @Override
