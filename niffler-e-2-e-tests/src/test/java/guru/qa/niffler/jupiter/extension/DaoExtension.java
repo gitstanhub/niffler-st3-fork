@@ -1,10 +1,11 @@
-package guru.qa.niffler.jupiter;
+package guru.qa.niffler.jupiter.extension;
 
-import guru.qa.niffler.db.dao.AuthUserDAO;
-import guru.qa.niffler.db.dao.AuthUserDAOHibernate;
-import guru.qa.niffler.db.dao.AuthUserDAOJdbc;
-import guru.qa.niffler.db.dao.AuthUserDAOSpringJdbc;
-import guru.qa.niffler.db.dao.UserDataUserDAO;
+import guru.qa.niffler.db.dao.AuthDAO;
+import guru.qa.niffler.db.dao.AuthAndUserDataDAOHibernate;
+import guru.qa.niffler.db.dao.AuthAndUserDataDAOJdbc;
+import guru.qa.niffler.db.dao.AuthAndUserDataDAOSpringJdbc;
+import guru.qa.niffler.db.dao.UserDataDAO;
+import guru.qa.niffler.jupiter.annotation.Dao;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 
@@ -15,18 +16,18 @@ public class DaoExtension implements TestInstancePostProcessor {
     @Override
     public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
         for (Field field : testInstance.getClass().getDeclaredFields()) {
-            if ((field.getType().isAssignableFrom(AuthUserDAO.class) || field.getType().isAssignableFrom(UserDataUserDAO.class))
+            if ((field.getType().isAssignableFrom(AuthDAO.class) || field.getType().isAssignableFrom(UserDataDAO.class))
                     && field.isAnnotationPresent(Dao.class)) {
                 field.setAccessible(true);
 
-                AuthUserDAO dao;
+                AuthDAO dao;
 
                 if ("hibernate".equals(System.getProperty("db.impl"))) {
-                    dao = new AuthUserDAOHibernate();
+                    dao = new AuthAndUserDataDAOHibernate();
                 } else if ("spring".equals(System.getProperty("db.impl"))) {
-                    dao = new AuthUserDAOSpringJdbc();
+                    dao = new AuthAndUserDataDAOSpringJdbc();
                 } else {
-                    dao = new AuthUserDAOJdbc();
+                    dao = new AuthAndUserDataDAOJdbc();
                 }
 
                 field.set(testInstance, dao);

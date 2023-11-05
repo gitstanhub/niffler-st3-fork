@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class UserEntity {
+public class AuthUserEntity {
 
     private UUID id;
     private String username;
@@ -13,7 +13,7 @@ public class UserEntity {
     private Boolean accountNonExpired;
     private Boolean accountNonLocked;
     private Boolean credentialsNonExpired;
-    private List<AuthorityEntity> authorities = new ArrayList<>();
+    private List<AuthAuthorityEntity> authorities = new ArrayList<>();
 
     public UUID getId() {
         return id;
@@ -71,15 +71,15 @@ public class UserEntity {
         this.credentialsNonExpired = credentialsNonExpired;
     }
 
-    public List<AuthorityEntity> getAuthorities() {
+    public List<AuthAuthorityEntity> getAuthorities() {
         return authorities;
     }
 
-    public void setAuthorities(List<AuthorityEntity> authorities) {
+    public void setAuthorities(List<AuthAuthorityEntity> authorities) {
         this.authorities = authorities;
     }
 
-    public void addAuthorities(AuthorityEntity... authorities) {
+    public void addAuthorities(AuthAuthorityEntity... authorities) {
         this.authorities.addAll(List.of(authorities));
     }
 
