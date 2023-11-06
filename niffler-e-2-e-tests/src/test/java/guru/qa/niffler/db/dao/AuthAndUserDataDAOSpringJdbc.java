@@ -3,12 +3,10 @@ package guru.qa.niffler.db.dao;
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.ServiceDB;
 import guru.qa.niffler.db.mapper.UserEntityRowMapper;
-import guru.qa.niffler.db.model.AuthUserEntity;
-import guru.qa.niffler.db.model.Authority;
-import guru.qa.niffler.db.model.CurrencyValues;
-import guru.qa.niffler.db.model.UserDataUserEntity;
+import guru.qa.niffler.db.model.*;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.support.KeyHolder;
@@ -17,12 +15,13 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.UUID;
 
 public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
 
-    private final TransactionTemplate authTtpl;
-    private final TransactionTemplate userdataTtpl;
+    private final TransactionTemplate authTemplate;
+    private final TransactionTemplate userdataTemplate;
     private final JdbcTemplate authJdbcTemplate;
     private final JdbcTemplate userdataJdbcTemplate;
 
@@ -32,15 +31,16 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
         JdbcTransactionManager userdataTm = new JdbcTransactionManager(
                 DataSourceProvider.INSTANCE.getDataSource(ServiceDB.USERDATA));
 
-        this.authTtpl = new TransactionTemplate(authTm);
-        this.userdataTtpl = new TransactionTemplate(userdataTm);
+        this.authTemplate = new TransactionTemplate(authTm);
+        this.userdataTemplate = new TransactionTemplate(userdataTm);
         this.authJdbcTemplate = new JdbcTemplate(authTm.getDataSource());
         this.userdataJdbcTemplate = new JdbcTemplate(userdataTm.getDataSource());
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Override
     public int createUserInAuth(AuthUserEntity user) {
-        return authTtpl.execute(status -> {
+        return authTemplate.execute(status -> {
             KeyHolder kh = new GeneratedKeyHolder();
 
             authJdbcTemplate.update(con -> {
@@ -54,7 +54,9 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
                 ps.setBoolean(6, user.getCredentialsNonExpired());
                 return ps;
             }, kh);
+
             final UUID userId = (UUID) kh.getKeyList().get(0).get("id");
+
             authJdbcTemplate.batchUpdate("INSERT INTO authorities (user_id, authority) VALUES (?, ?)", new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -72,18 +74,27 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public AuthUserEntity updateUserInAuth(AuthUserEntity user) {
-        return null;
-    }
-
-    @Override
     public AuthUserEntity getUserByIdFromAuth(UUID userId) {
-        return authJdbcTemplate.queryForObject(
-                "SELECT * FROM users WHERE id = ? ",
+        AuthUserEntity user = authJdbcTemplate.queryForObject(
+                "SELECT * FROM users WHERE id = ?",
                 UserEntityRowMapper.instance,
                 userId
         );
+
+        if (user != null) {
+            List<AuthAuthorityEntity> authorities = authJdbcTemplate.query(
+                    "SELECT * FROM authorities where user_id = ?",
+
+            )
+        }
     }
+
+    @Override
+    public AuthUserEntity updateUserInAuth(AuthUserEntity user) {
+
+
+    }
+
 
     @Override
     public void deleteUserByIdInAuth(UUID userId) {
@@ -100,13 +111,13 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void updateUserInUserData(UserDataUserEntity user) {
-
+    public UserDataUserEntity getUserByUsernameFromUserData(String username) {
+        return null;
     }
 
     @Override
-    public UserDataUserEntity getUserByUsernameFromUserData(String username) {
-        return null;
+    public void updateUserInUserData(UserDataUserEntity user) {
+
     }
 
     @Override

@@ -7,9 +7,9 @@ public interface UserDataDAO {
 
     int createUserInUserData(AuthUserEntity user);
 
-    void updateUserInUserData(UserDataUserEntity user);
-
     UserDataUserEntity getUserByUsernameFromUserData(String username);
+
+    void updateUserInUserData(UserDataUserEntity user);
 
     void deleteUserByUsernameInUserData(String username);
 }
