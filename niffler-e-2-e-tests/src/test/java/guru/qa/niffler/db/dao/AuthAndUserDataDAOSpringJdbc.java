@@ -2,6 +2,7 @@ package guru.qa.niffler.db.dao;
 
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.ServiceDB;
+import guru.qa.niffler.db.mapper.AuthAuthorityEntityRowMapper;
 import guru.qa.niffler.db.mapper.UserEntityRowMapper;
 import guru.qa.niffler.db.model.*;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -79,14 +80,20 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
                 "SELECT * FROM users WHERE id = ?",
                 UserEntityRowMapper.instance,
                 userId
+
         );
 
         if (user != null) {
-            List<AuthAuthorityEntity> authorities = authJdbcTemplate.query(
+            List<AuthAuthorityEntity> authorities = authJdbcTemplate.queryForObject(
                     "SELECT * FROM authorities where user_id = ?",
+                    AuthAuthorityEntityRowMapper.instance,
+                    userId
+            );
 
-            )
+            user.setAuthorities(authorities);
         }
+
+        return user;
     }
 
     @Override
