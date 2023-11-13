@@ -7,7 +7,6 @@ import guru.qa.niffler.db.mapper.UserEntityRowMapper;
 import guru.qa.niffler.db.model.*;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.support.KeyHolder;
@@ -98,10 +97,24 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
 
     @Override
     public AuthUserEntity updateUserInAuth(AuthUserEntity user) {
+        return authTemplate.execute(status -> {
 
+            authJdbcTemplate.update(con -> {
+                PreparedStatement ps = con.prepareStatement("UPDATE users SET password = ?, enabled = ?, " +
+                        "account_non_expired = ?, account_non_locked = ?, credentials_non_expired = ? " +
+                        "WHERE id = ?");
+                ps.setString(1, pe.encode(user.getPassword()));
+                ps.setBoolean(2, user.getEnabled());
+                ps.setBoolean(3, user.getAccountNonLocked());
+                ps.setBoolean(4, user.getAccountNonLocked());
+                ps.setBoolean(5, user.getCredentialsNonExpired());
+                ps.setObject(6, user.getId());
+                return ps;
+            });
 
+            return getUserByIdFromAuth(user.getId());
+        });
     }
-
 
     @Override
     public void deleteUserByIdInAuth(UUID userId) {

@@ -125,7 +125,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
 
             try (PreparedStatement userPs = connection.prepareStatement(
                     "UPDATE users SET password = ?, enabled = ?, account_non_expired = ?, " +
-                            "account_non_locked = ?, credentials_non_expired = ?" +
+                            "account_non_locked = ?, credentials_non_expired = ? " +
                             "WHERE id = ?"
             )) {
                 userPs.setString(1, pe.encode(user.getPassword()));
