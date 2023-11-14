@@ -15,14 +15,14 @@ public class AuthAuthorityEntityRowMapper implements RowMapper<List<AuthAuthorit
 
     @Override
     public List<AuthAuthorityEntity> mapRow(ResultSet rs, int rowNum) throws SQLException {
-        List<AuthAuthorityEntity> authorityEntityList = new ArrayList<>();
+        List<AuthAuthorityEntity> authoritiesList = new ArrayList<>();
 
         while (rs.next()) {
             AuthAuthorityEntity authority = new AuthAuthorityEntity();
             authority.setAuthority(Authority.valueOf(rs.getString("authority")));
-            authorityEntityList.add(authority);
+            authoritiesList.add(authority);
         }
 
-        return authorityEntityList;
+        return authoritiesList;
     }
 }

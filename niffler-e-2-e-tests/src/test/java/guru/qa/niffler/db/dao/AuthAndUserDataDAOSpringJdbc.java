@@ -3,7 +3,8 @@ package guru.qa.niffler.db.dao;
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.ServiceDB;
 import guru.qa.niffler.db.mapper.AuthAuthorityEntityRowMapper;
-import guru.qa.niffler.db.mapper.UserEntityRowMapper;
+import guru.qa.niffler.db.mapper.AuthUserEntityRowMapper;
+import guru.qa.niffler.db.mapper.UserDataUserEntityRowMapper;
 import guru.qa.niffler.db.model.*;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -77,9 +78,8 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
     public AuthUserEntity getUserByIdFromAuth(UUID userId) {
         AuthUserEntity user = authJdbcTemplate.queryForObject(
                 "SELECT * FROM users WHERE id = ?",
-                UserEntityRowMapper.instance,
+                AuthUserEntityRowMapper.instance,
                 userId
-
         );
 
         if (user != null) {
@@ -118,34 +118,47 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
 
     @Override
     public void deleteUserByIdInAuth(UUID userId) {
-         authTemplate.executeWithoutResult(status -> {
+        authTemplate.executeWithoutResult(status -> {
 
-             authJdbcTemplate.update("DELETE FROM authorities WHERE user_id = ?", userId);
-             authJdbcTemplate.update("DELETE FROM users WHERE id = ?", userId);
-         });
+            authJdbcTemplate.update("DELETE FROM authorities WHERE user_id = ?", userId);
+            authJdbcTemplate.update("DELETE FROM users WHERE id = ?", userId);
+        });
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Override
     public int createUserInUserData(AuthUserEntity user) {
-        return userdataJdbcTemplate.update(
-                "INSERT INTO users (username, currency) VALUES (?, ?)",
-                user.getUsername(),
-                CurrencyValues.RUB.name()
-        );
+        return userdataTemplate.execute(status -> {
+            userdataJdbcTemplate.update(
+                    "INSERT INTO users (username, currency) VALUES (?, ?)",
+                    user.getUsername(),
+                    CurrencyValues.EUR.name()
+            );
+            return 1;
+        });
     }
 
     @Override
     public UserDataUserEntity getUserByUsernameFromUserData(String username) {
-        return null;
+        return userdataJdbcTemplate.queryForObject(
+                "SELECT * FROM users WHERE username = ?",
+                UserDataUserEntityRowMapper.instance,
+                username
+        );
     }
 
     @Override
     public void updateUserInUserData(UserDataUserEntity user) {
-
+        userdataTemplate.executeWithoutResult(status ->
+                userdataJdbcTemplate.update(
+                        "UPDATE users SET currency = ?, firstname = ?, surname = ? " +
+                                "WHERE id = ?",
+                        user.getCurrency(), user.getFirstName(), user.getSurname(), user.getId()));
     }
 
     @Override
     public void deleteUserByUsernameInUserData(String username) {
-        userdataJdbcTemplate.update("DELETE FROM users WHERE username = ?", username);
+        userdataTemplate.executeWithoutResult(status ->
+                userdataJdbcTemplate.update("DELETE FROM users WHERE username = ?", username));
     }
 }
