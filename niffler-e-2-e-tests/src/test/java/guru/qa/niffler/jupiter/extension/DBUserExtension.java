@@ -1,6 +1,7 @@
 package guru.qa.niffler.jupiter.extension;
 
-import guru.qa.niffler.db.dao.AuthAndUserDataDAOJdbc;
+import com.github.javafaker.Faker;
+import guru.qa.niffler.db.dao.AuthAndUserDataDAOSpringJdbc;
 import guru.qa.niffler.db.dao.AuthDAO;
 import guru.qa.niffler.db.dao.UserDataDAO;
 import guru.qa.niffler.db.model.AuthAuthorityEntity;
@@ -11,13 +12,12 @@ import org.junit.jupiter.api.extension.*;
 
 import java.util.Arrays;
 
-public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, ParameterResolver {
+public class  DBUserExtension implements BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
     public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
 
-        private static final AuthDAO authDao = new AuthAndUserDataDAOJdbc();
-        private static final UserDataDAO userDataDAO = new AuthAndUserDataDAOJdbc();
-
+        private static final AuthDAO authDao = new AuthAndUserDataDAOSpringJdbc();
+        private static final UserDataDAO userDataDAO = new AuthAndUserDataDAOSpringJdbc();
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
@@ -51,15 +51,18 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
         AuthUserEntity user = extensionContext.getStore(DBUserExtension.NAMESPACE)
                 .get(extensionContext.getUniqueId(), AuthUserEntity.class);
 
+        System.out.println(user.getId() + "HAHAHA");
+        System.out.println(user.getUsername());
         userDataDAO.deleteUserByUsernameInUserData(user.getUsername());
         authDao.deleteUserByIdInAuth(user.getId());
     }
 
     private AuthUserEntity createAuthUserEntity(DBUser dbUser) {
+        Faker faker = new Faker();
         AuthUserEntity authUserEntity = new AuthUserEntity();
 
-        authUserEntity.setUsername(dbUser.username());
-        authUserEntity.setPassword(dbUser.password());
+        authUserEntity.setUsername(dbUser.username().isEmpty() ? faker.name().username() : dbUser.username());
+        authUserEntity.setPassword(dbUser.password().isEmpty() ? faker.internet().password() : dbUser.password());
         authUserEntity.setEnabled(true);
         authUserEntity.setAccountNonExpired(true);
         authUserEntity.setAccountNonLocked(true);

@@ -57,6 +57,7 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
             }, kh);
 
             final UUID userId = (UUID) kh.getKeyList().get(0).get("id");
+            user.setId(userId);
 
             authJdbcTemplate.batchUpdate("INSERT INTO authorities (user_id, authority) VALUES (?, ?)", new BatchPreparedStatementSetter() {
                 @Override
@@ -118,11 +119,11 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
 
     @Override
     public void deleteUserByIdInAuth(UUID userId) {
-        authTemplate.executeWithoutResult(status -> {
+        authTemplate.executeWithoutResult(status ->
+                authJdbcTemplate.update("DELETE FROM authorities WHERE user_id = ?", userId));
 
-            authJdbcTemplate.update("DELETE FROM authorities WHERE user_id = ?", userId);
-            authJdbcTemplate.update("DELETE FROM users WHERE id = ?", userId);
-        });
+        authTemplate.executeWithoutResult(status ->
+                authJdbcTemplate.update("DELETE FROM users WHERE id = ?", userId));
     }
 
     @SuppressWarnings("DataFlowIssue")

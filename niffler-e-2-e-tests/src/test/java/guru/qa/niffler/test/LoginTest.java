@@ -6,11 +6,7 @@ import org.junit.jupiter.api.Test;
 
 public class LoginTest extends BaseWebTest {
 
-    @DBUser(
-            username = "bear_ber",
-            password = "12345"
-    )
-
+    @DBUser
     @Test
     void mainPageShouldBeVisibleAfterLogin(AuthUserEntity user) {
         loginPage
