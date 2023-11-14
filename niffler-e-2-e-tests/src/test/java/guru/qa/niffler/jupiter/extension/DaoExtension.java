@@ -2,7 +2,6 @@ package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.db.dao.AuthDAO;
 import guru.qa.niffler.db.dao.AuthAndUserDataDAOHibernate;
-import guru.qa.niffler.db.dao.AuthAndUserDataDAOJdbc;
 import guru.qa.niffler.db.dao.AuthAndUserDataDAOSpringJdbc;
 import guru.qa.niffler.db.dao.UserDataDAO;
 import guru.qa.niffler.jupiter.annotation.Dao;
