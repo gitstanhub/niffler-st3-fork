@@ -60,8 +60,8 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
         AuthUserEntity user = extensionContext.getStore(DBUserExtension.NAMESPACE)
                 .get(extensionContext.getUniqueId(), AuthUserEntity.class);
 
-        userDataDAO.deleteUserByUsernameInUserData(user.getUsername());
-        authDao.deleteUserByIdInAuth(user.getId());
+        userDataDAO.deleteUserInUserData(user.getUsername());
+        authDao.deleteUserInAuth(user.getId());
     }
 
     private AuthUserEntity createAuthUserEntity(DBUser dbUser) {

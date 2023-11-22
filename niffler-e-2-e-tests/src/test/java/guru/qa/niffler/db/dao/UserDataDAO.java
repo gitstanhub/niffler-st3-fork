@@ -11,5 +11,5 @@ public interface UserDataDAO {
 
     void updateUserInUserData(UserDataUserEntity user);
 
-    void deleteUserByUsernameInUserData(String username);
+    void deleteUserInUserData(UserDataUserEntity user);
 }

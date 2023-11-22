@@ -151,7 +151,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void deleteUserByIdInAuth(UUID userId) {
+    public void deleteUserInAuth(UUID userId) {
         try (Connection connection = authDs.getConnection()) {
             connection.setAutoCommit(false);
 
@@ -264,7 +264,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void deleteUserByUsernameInUserData(String username) {
+    public void deleteUserInUserData(String username) {
         try (Connection connection = userdataDs.getConnection()) {
             connection.setAutoCommit(false);
 
