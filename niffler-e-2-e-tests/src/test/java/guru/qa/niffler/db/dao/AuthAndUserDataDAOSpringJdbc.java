@@ -118,7 +118,9 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void deleteUserInAuth(UUID userId) {
+    public void deleteUserInAuth(AuthUserEntity user) {
+        UUID userId = user.getId();
+
         authTemplate.executeWithoutResult(status ->
                 authJdbcTemplate.update("DELETE FROM authorities WHERE user_id = ?", userId));
 
@@ -158,7 +160,9 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void deleteUserInUserData(String username) {
+    public void deleteUserInUserData(UserDataUserEntity user) {
+        String username = user.getUsername();
+
         userdataTemplate.executeWithoutResult(status ->
                 userdataJdbcTemplate.update("DELETE FROM users WHERE username = ?", username));
     }
