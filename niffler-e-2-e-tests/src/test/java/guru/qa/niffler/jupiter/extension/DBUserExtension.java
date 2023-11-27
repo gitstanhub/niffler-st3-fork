@@ -4,9 +4,7 @@ import com.github.javafaker.Faker;
 import guru.qa.niffler.db.dao.AuthAndUserDataDAOSpringJdbc;
 import guru.qa.niffler.db.dao.AuthDAO;
 import guru.qa.niffler.db.dao.UserDataDAO;
-import guru.qa.niffler.db.model.AuthAuthorityEntity;
-import guru.qa.niffler.db.model.AuthUserEntity;
-import guru.qa.niffler.db.model.Authority;
+import guru.qa.niffler.db.model.*;
 import guru.qa.niffler.jupiter.annotation.DBUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.*;
@@ -23,16 +21,21 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
-        String entityKey = "authUserEntity";
+        String authUserEntityKey = extensionContext.getUniqueId() + "authUserEntity";
+        String userDataUserEntityKey = extensionContext.getUniqueId() + "userDataUserEntity";
 
-        AuthUserEntity authUserEntity = extensionContext.getStore(NAMESPACE).get(entityKey, AuthUserEntity.class);
+        AuthUserEntity authUserEntity = extensionContext.getStore(NAMESPACE).get(authUserEntityKey, AuthUserEntity.class);
+        UserDataUserEntity userDataUserEntity = extensionContext.getStore(NAMESPACE).get(userDataUserEntityKey, UserDataUserEntity.class);
 
-        if (authUserEntity == null) {
+        if (authUserEntity == null && userDataUserEntity == null) {
             DBUser dbUserAnnotation = getDbUserAnnotation(extensionContext);
             if (dbUserAnnotation != null) {
                 authUserEntity = createAuthUserEntity(dbUserAnnotation);
-                persistUserEntity(authUserEntity);
-                extensionContext.getStore(NAMESPACE).put(extensionContext.getUniqueId(), authUserEntity);
+                userDataUserEntity = createUserDataUserEntity(authUserEntity);
+
+                persistUserEntity(authUserEntity, userDataUserEntity);
+                extensionContext.getStore(NAMESPACE).put(authUserEntityKey, authUserEntity);
+                extensionContext.getStore(NAMESPACE).put(userDataUserEntityKey, userDataUserEntity);
             }
         }
     }
@@ -46,22 +49,31 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
                 extensionContext.getTestMethod().get().isAnnotationPresent(DBUser.class)
                 || Arrays.stream(extensionContext.getRequiredTestClass().getDeclaredMethods())
                 .anyMatch(method -> method.isAnnotationPresent(BeforeEach.class)
-                && method.isAnnotationPresent(DBUser.class));
+                        && method.isAnnotationPresent(DBUser.class));
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+        String authUserEntityKey = extensionContext.getUniqueId() + "authUserEntity";
+
         return extensionContext.getStore(DBUserExtension.NAMESPACE)
-                .get(extensionContext.getUniqueId(), AuthUserEntity.class);
+                .get(authUserEntityKey, AuthUserEntity.class);
     }
 
     @Override
     public void afterEach(ExtensionContext extensionContext) throws Exception {
-        AuthUserEntity user = extensionContext.getStore(DBUserExtension.NAMESPACE)
-                .get(extensionContext.getUniqueId(), AuthUserEntity.class);
+        String authUserEntityKey = extensionContext.getUniqueId() + "authUserEntity";
+        String userDataUserEntityKey = extensionContext.getUniqueId() + "userDataUserEntity";
 
-        userDataDAO.deleteUserInUserData(user.getUsername());
-        authDao.deleteUserInAuth(user.getId());
+        AuthUserEntity authUserEntity = extensionContext.getStore(DBUserExtension.NAMESPACE)
+                .get(authUserEntityKey, AuthUserEntity.class);
+
+        UserDataUserEntity userDataUserEntity = extensionContext.getStore(NAMESPACE)
+                .get(userDataUserEntityKey, UserDataUserEntity.class);
+
+
+        userDataDAO.deleteUserInUserData(userDataUserEntity);
+        authDao.deleteUserInAuth(authUserEntity);
     }
 
     private AuthUserEntity createAuthUserEntity(DBUser dbUser) {
@@ -84,6 +96,16 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
         return authUserEntity;
     }
 
+    private UserDataUserEntity createUserDataUserEntity(AuthUserEntity authUserEntity) {
+
+        UserDataUserEntity userDataUserEntity = new UserDataUserEntity();
+
+        userDataUserEntity.setUsername(authUserEntity.getUsername());
+        userDataUserEntity.setCurrency(CurrencyValues.EUR.name());
+
+        return userDataUserEntity;
+    }
+
     private DBUser getDbUserAnnotation(ExtensionContext extensionContext) {
 
         DBUser dbUserAnnotation = extensionContext.getRequiredTestMethod().getAnnotation(DBUser.class);
@@ -99,8 +121,8 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
                 .orElse(null);
     }
 
-    private void persistUserEntity(AuthUserEntity authUserEntity) {
+    private void persistUserEntity(AuthUserEntity authUserEntity, UserDataUserEntity userDataUserEntity) {
         authDao.createUserInAuth(authUserEntity);
-        userDataDAO.createUserInUserData(authUserEntity);
+        userDataDAO.createUserInUserData(userDataUserEntity);
     }
 }

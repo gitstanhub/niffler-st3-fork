@@ -130,12 +130,12 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
 
     @SuppressWarnings("DataFlowIssue")
     @Override
-    public int createUserInUserData(AuthUserEntity user) {
+    public int createUserInUserData(UserDataUserEntity user) {
         return userdataTemplate.execute(status -> {
             userdataJdbcTemplate.update(
                     "INSERT INTO users (username, currency) VALUES (?, ?)",
                     user.getUsername(),
-                    CurrencyValues.EUR.name()
+                    user.getCurrency()
             );
             return 1;
         });

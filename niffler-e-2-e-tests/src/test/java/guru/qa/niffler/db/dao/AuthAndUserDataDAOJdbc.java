@@ -180,7 +180,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public int createUserInUserData(AuthUserEntity user) {
+    public int createUserInUserData(UserDataUserEntity user) {
         int createdRows = 0;
         try (Connection connection = userdataDs.getConnection()) {
             connection.setAutoCommit(false);
