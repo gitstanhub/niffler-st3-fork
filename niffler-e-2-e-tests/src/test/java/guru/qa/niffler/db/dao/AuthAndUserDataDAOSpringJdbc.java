@@ -5,7 +5,10 @@ import guru.qa.niffler.db.ServiceDB;
 import guru.qa.niffler.db.mapper.AuthAuthorityEntityRowMapper;
 import guru.qa.niffler.db.mapper.AuthUserEntityRowMapper;
 import guru.qa.niffler.db.mapper.UserDataUserEntityRowMapper;
-import guru.qa.niffler.db.model.*;
+import guru.qa.niffler.db.model.auth.AuthAuthorityEntity;
+import guru.qa.niffler.db.model.auth.AuthUserEntity;
+import guru.qa.niffler.db.model.auth.Authority;
+import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -151,12 +154,14 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void updateUserInUserData(UserDataUserEntity user) {
+    public UserDataUserEntity updateUserInUserData(UserDataUserEntity user) {
         userdataTemplate.executeWithoutResult(status ->
                 userdataJdbcTemplate.update(
                         "UPDATE users SET currency = ?, firstname = ?, surname = ? " +
                                 "WHERE id = ?",
                         user.getCurrency(), user.getFirstName(), user.getSurname(), user.getId()));
+
+        return getUserByUsernameFromUserData(user.getUsername());
     }
 
     @Override

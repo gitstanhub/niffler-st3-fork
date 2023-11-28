@@ -1,6 +1,6 @@
 package guru.qa.niffler.db.dao;
 
-import guru.qa.niffler.db.model.AuthUserEntity;
+import guru.qa.niffler.db.model.auth.AuthUserEntity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 

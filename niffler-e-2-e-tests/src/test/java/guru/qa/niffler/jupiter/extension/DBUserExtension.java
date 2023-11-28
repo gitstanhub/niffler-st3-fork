@@ -1,10 +1,12 @@
 package guru.qa.niffler.jupiter.extension;
 
 import com.github.javafaker.Faker;
-import guru.qa.niffler.db.dao.AuthAndUserDataDAOSpringJdbc;
-import guru.qa.niffler.db.dao.AuthDAO;
-import guru.qa.niffler.db.dao.UserDataDAO;
-import guru.qa.niffler.db.model.*;
+import guru.qa.niffler.db.dao.*;
+import guru.qa.niffler.db.model.auth.AuthAuthorityEntity;
+import guru.qa.niffler.db.model.auth.AuthUserEntity;
+import guru.qa.niffler.db.model.auth.Authority;
+import guru.qa.niffler.db.model.userdata.CurrencyValues;
+import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
 import guru.qa.niffler.jupiter.annotation.DBUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.*;
@@ -16,8 +18,8 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
 
     public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
 
-    private static final AuthDAO authDao = new AuthAndUserDataDAOSpringJdbc();
-    private static final UserDataDAO userDataDAO = new AuthAndUserDataDAOSpringJdbc();
+    private static final AuthDAO authDao = new AuthDAOHibernate();
+    private static final UserDataDAO userDataDAO = new UserDataDAOHibernate();
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
@@ -90,6 +92,7 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
                 .map(authority -> {
                     AuthAuthorityEntity authAuthorityEntity = new AuthAuthorityEntity();
                     authAuthorityEntity.setAuthority(authority);
+                    authAuthorityEntity.setUser(authUserEntity);
                     return authAuthorityEntity;
                 }).toList());
 
@@ -101,7 +104,7 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
         UserDataUserEntity userDataUserEntity = new UserDataUserEntity();
 
         userDataUserEntity.setUsername(authUserEntity.getUsername());
-        userDataUserEntity.setCurrency(CurrencyValues.EUR.name());
+        userDataUserEntity.setCurrency(CurrencyValues.EUR);
 
         return userDataUserEntity;
     }

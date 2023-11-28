@@ -2,7 +2,11 @@ package guru.qa.niffler.db.dao;
 
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.ServiceDB;
-import guru.qa.niffler.db.model.*;
+import guru.qa.niffler.db.model.auth.AuthAuthorityEntity;
+import guru.qa.niffler.db.model.auth.AuthUserEntity;
+import guru.qa.niffler.db.model.auth.Authority;
+import guru.qa.niffler.db.model.userdata.CurrencyValues;
+import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -224,7 +228,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
                 while (usersResultSet.next()) {
                     user.setId(usersResultSet.getObject("id", UUID.class));
                     user.setUsername(usersResultSet.getString("username"));
-                    user.setCurrency(usersResultSet.getString("currency"));
+                    user.setCurrency(CurrencyValues.valueOf(usersResultSet.getString("currency")));
                     user.setFirstName(usersResultSet.getString("firstname"));
                     user.setSurname(usersResultSet.getString("surname"));
                     user.setPhoto(usersResultSet.getBytes("photo"));
@@ -238,7 +242,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void updateUserInUserData(UserDataUserEntity user) {
+    public UserDataUserEntity updateUserInUserData(UserDataUserEntity user) {
         try (Connection connection = userdataDs.getConnection()) {
             connection.setAutoCommit(false);
 
@@ -246,7 +250,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
                     "UPDATE users SET currency = ?, firstname = ?, surname = ?" +
                             "WHERE id = ?"
             )) {
-                usersPs.setString(1, user.getCurrency());
+                usersPs.setString(1, user.getCurrency().toString());
                 usersPs.setString(2, user.getFirstName());
                 usersPs.setString(3, user.getSurname());
                 usersPs.setObject(4, user.getId());
@@ -263,6 +267,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return getUserByUsernameFromUserData(user.getUsername());
     }
 
     @Override
