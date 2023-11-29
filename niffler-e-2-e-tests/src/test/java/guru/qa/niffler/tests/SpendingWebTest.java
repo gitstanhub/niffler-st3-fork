@@ -1,4 +1,4 @@
-package guru.qa.niffler.test;
+package guru.qa.niffler.tests;
 
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.jupiter.annotation.Category;

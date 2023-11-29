@@ -1,4 +1,4 @@
-package guru.qa.niffler.test;
+package guru.qa.niffler.tests;
 
 import guru.qa.niffler.db.model.auth.AuthUserEntity;
 import guru.qa.niffler.jupiter.annotation.DBUser;
