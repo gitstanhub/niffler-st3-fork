@@ -1,12 +1,14 @@
 package guru.qa.niffler.jupiter.extension;
 
 import com.github.javafaker.Faker;
+
 import guru.qa.niffler.db.dao.*;
 import guru.qa.niffler.db.model.auth.AuthAuthorityEntity;
 import guru.qa.niffler.db.model.auth.AuthUserEntity;
 import guru.qa.niffler.db.model.auth.Authority;
 import guru.qa.niffler.db.model.userdata.CurrencyValues;
 import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
+
 import guru.qa.niffler.jupiter.annotation.DBUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.*;
@@ -52,6 +54,7 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
                 || Arrays.stream(extensionContext.getRequiredTestClass().getDeclaredMethods())
                 .anyMatch(method -> method.isAnnotationPresent(BeforeEach.class)
                         && method.isAnnotationPresent(DBUser.class));
+
     }
 
     @Override

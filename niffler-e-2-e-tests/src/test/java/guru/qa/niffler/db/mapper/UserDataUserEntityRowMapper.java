@@ -2,6 +2,7 @@ package guru.qa.niffler.db.mapper;
 
 import guru.qa.niffler.db.model.userdata.CurrencyValues;
 import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
+
 import org.springframework.jdbc.core.RowMapper;
 
 

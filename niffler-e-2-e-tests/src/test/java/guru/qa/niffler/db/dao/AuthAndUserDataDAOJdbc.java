@@ -243,6 +243,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
 
     @Override
     public UserDataUserEntity updateUserInUserData(UserDataUserEntity user) {
+
         try (Connection connection = userdataDs.getConnection()) {
             connection.setAutoCommit(false);
 
@@ -250,7 +251,9 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
                     "UPDATE users SET currency = ?, firstname = ?, surname = ?" +
                             "WHERE id = ?"
             )) {
+
                 usersPs.setString(1, user.getCurrency().toString());
+
                 usersPs.setString(2, user.getFirstName());
                 usersPs.setString(3, user.getSurname());
                 usersPs.setObject(4, user.getId());
@@ -267,6 +270,7 @@ public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
         return getUserByUsernameFromUserData(user.getUsername());
     }
 
