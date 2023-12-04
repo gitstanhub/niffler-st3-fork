@@ -19,14 +19,12 @@ import java.util.Objects;
 public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
     public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
-
-    private static final AuthDAO authDao = new AuthDAOHibernate();
-    private static final UserDataDAO userDataDAO = new UserDataDAOHibernate();
+    private static final String USER_KEY = "context_user_";
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
-        String authUserEntityKey = extensionContext.getUniqueId() + "authUserEntity";
-        String userDataUserEntityKey = extensionContext.getUniqueId() + "userDataUserEntity";
+        String authUserEntityKey = USER_KEY + "authUserEntity";
+        String userDataUserEntityKey = USER_KEY + "userDataUserEntity";
 
         AuthUserEntity authUserEntity = extensionContext.getStore(NAMESPACE).get(authUserEntityKey, AuthUserEntity.class);
         UserDataUserEntity userDataUserEntity = extensionContext.getStore(NAMESPACE).get(userDataUserEntityKey, UserDataUserEntity.class);
@@ -59,7 +57,7 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
-        String authUserEntityKey = extensionContext.getUniqueId() + "authUserEntity";
+        String authUserEntityKey = USER_KEY + "authUserEntity";
 
         return extensionContext.getStore(DBUserExtension.NAMESPACE)
                 .get(authUserEntityKey, AuthUserEntity.class);
@@ -67,8 +65,11 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
 
     @Override
     public void afterEach(ExtensionContext extensionContext) throws Exception {
-        String authUserEntityKey = extensionContext.getUniqueId() + "authUserEntity";
-        String userDataUserEntityKey = extensionContext.getUniqueId() + "userDataUserEntity";
+        AuthDAO authDao = new AuthDAOHibernate();
+        UserDataDAO userDataDAO = new UserDataDAOHibernate();
+
+        String authUserEntityKey = USER_KEY + "authUserEntity";
+        String userDataUserEntityKey = USER_KEY + "userDataUserEntity";
 
         AuthUserEntity authUserEntity = extensionContext.getStore(DBUserExtension.NAMESPACE)
                 .get(authUserEntityKey, AuthUserEntity.class);
@@ -128,6 +129,9 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
     }
 
     private void persistUserEntity(AuthUserEntity authUserEntity, UserDataUserEntity userDataUserEntity) {
+        AuthDAO authDao = new AuthDAOHibernate();
+        UserDataDAO userDataDAO = new UserDataDAOHibernate();
+
         authDao.createUserInAuth(authUserEntity);
         userDataDAO.createUserInUserData(userDataUserEntity);
     }
