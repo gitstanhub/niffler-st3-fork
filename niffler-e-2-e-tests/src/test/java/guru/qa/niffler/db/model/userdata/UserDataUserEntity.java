@@ -1,14 +1,32 @@
-package guru.qa.niffler.db.model;
+package guru.qa.niffler.db.model.userdata;
+
+import jakarta.persistence.*;
 
 import java.util.UUID;
 
+@Entity
+@Table(name = "users")
 public class UserDataUserEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false, columnDefinition = "UUID default gen_random_uuid()")
     private UUID id;
+
+    @Column(nullable = false, unique = true)
     private String username;
-    private String currency;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CurrencyValues currency;
+
+    @Column()
     private String firstName;
+
+    @Column()
     private String surname;
+
+    @Column(name = "photo", columnDefinition = "bytea")
     private byte[] photo;
 
     public UUID getId() {
@@ -27,11 +45,11 @@ public class UserDataUserEntity {
         this.username = username;
     }
 
-    public String getCurrency() {
+    public CurrencyValues getCurrency() {
         return currency;
     }
 
-    public void setCurrency(String currency) {
+    public void setCurrency(CurrencyValues currency) {
         this.currency = currency;
     }
 

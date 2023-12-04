@@ -5,7 +5,12 @@ import guru.qa.niffler.db.ServiceDB;
 import guru.qa.niffler.db.mapper.AuthAuthorityEntityRowMapper;
 import guru.qa.niffler.db.mapper.AuthUserEntityRowMapper;
 import guru.qa.niffler.db.mapper.UserDataUserEntityRowMapper;
-import guru.qa.niffler.db.model.*;
+
+import guru.qa.niffler.db.model.auth.AuthAuthorityEntity;
+import guru.qa.niffler.db.model.auth.AuthUserEntity;
+import guru.qa.niffler.db.model.auth.Authority;
+import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
+
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -118,7 +123,9 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void deleteUserByIdInAuth(UUID userId) {
+    public void deleteUserInAuth(AuthUserEntity user) {
+        UUID userId = user.getId();
+
         authTemplate.executeWithoutResult(status ->
                 authJdbcTemplate.update("DELETE FROM authorities WHERE user_id = ?", userId));
 
@@ -128,12 +135,15 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
 
     @SuppressWarnings("DataFlowIssue")
     @Override
-    public int createUserInUserData(AuthUserEntity user) {
+    public int createUserInUserData(UserDataUserEntity user) {
+
         return userdataTemplate.execute(status -> {
             userdataJdbcTemplate.update(
                     "INSERT INTO users (username, currency) VALUES (?, ?)",
                     user.getUsername(),
-                    CurrencyValues.EUR.name()
+
+                    user.getCurrency()
+
             );
             return 1;
         });
@@ -149,16 +159,20 @@ public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
     }
 
     @Override
-    public void updateUserInUserData(UserDataUserEntity user) {
+    public UserDataUserEntity updateUserInUserData(UserDataUserEntity user) {
         userdataTemplate.executeWithoutResult(status ->
                 userdataJdbcTemplate.update(
                         "UPDATE users SET currency = ?, firstname = ?, surname = ? " +
                                 "WHERE id = ?",
                         user.getCurrency(), user.getFirstName(), user.getSurname(), user.getId()));
+
+        return getUserByUsernameFromUserData(user.getUsername());
     }
 
     @Override
-    public void deleteUserByUsernameInUserData(String username) {
+    public void deleteUserInUserData(UserDataUserEntity user) {
+        String username = user.getUsername();
+
         userdataTemplate.executeWithoutResult(status ->
                 userdataJdbcTemplate.update("DELETE FROM users WHERE username = ?", username));
     }

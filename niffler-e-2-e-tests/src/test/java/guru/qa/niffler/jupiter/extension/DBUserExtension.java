@@ -1,12 +1,14 @@
 package guru.qa.niffler.jupiter.extension;
 
 import com.github.javafaker.Faker;
-import guru.qa.niffler.db.dao.AuthAndUserDataDAOSpringJdbc;
-import guru.qa.niffler.db.dao.AuthDAO;
-import guru.qa.niffler.db.dao.UserDataDAO;
-import guru.qa.niffler.db.model.AuthAuthorityEntity;
-import guru.qa.niffler.db.model.AuthUserEntity;
-import guru.qa.niffler.db.model.Authority;
+
+import guru.qa.niffler.db.dao.*;
+import guru.qa.niffler.db.model.auth.AuthAuthorityEntity;
+import guru.qa.niffler.db.model.auth.AuthUserEntity;
+import guru.qa.niffler.db.model.auth.Authority;
+import guru.qa.niffler.db.model.userdata.CurrencyValues;
+import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
+
 import guru.qa.niffler.jupiter.annotation.DBUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.*;
@@ -17,22 +19,25 @@ import java.util.Objects;
 public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
     public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
-
-    private static final AuthDAO authDao = new AuthAndUserDataDAOSpringJdbc();
-    private static final UserDataDAO userDataDAO = new AuthAndUserDataDAOSpringJdbc();
+    private static final String USER_KEY = "context_user_";
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
-        String entityKey = "authUserEntity";
+        String authUserEntityKey = USER_KEY + "authUserEntity";
+        String userDataUserEntityKey = USER_KEY + "userDataUserEntity";
 
-        AuthUserEntity authUserEntity = extensionContext.getStore(NAMESPACE).get(entityKey, AuthUserEntity.class);
+        AuthUserEntity authUserEntity = extensionContext.getStore(NAMESPACE).get(authUserEntityKey, AuthUserEntity.class);
+        UserDataUserEntity userDataUserEntity = extensionContext.getStore(NAMESPACE).get(userDataUserEntityKey, UserDataUserEntity.class);
 
-        if (authUserEntity == null) {
+        if (authUserEntity == null && userDataUserEntity == null) {
             DBUser dbUserAnnotation = getDbUserAnnotation(extensionContext);
             if (dbUserAnnotation != null) {
                 authUserEntity = createAuthUserEntity(dbUserAnnotation);
-                persistUserEntity(authUserEntity);
-                extensionContext.getStore(NAMESPACE).put(extensionContext.getUniqueId(), authUserEntity);
+                userDataUserEntity = createUserDataUserEntity(authUserEntity);
+
+                persistUserEntity(authUserEntity, userDataUserEntity);
+                extensionContext.getStore(NAMESPACE).put(authUserEntityKey, authUserEntity);
+                extensionContext.getStore(NAMESPACE).put(userDataUserEntityKey, userDataUserEntity);
             }
         }
     }
@@ -46,22 +51,35 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
                 extensionContext.getTestMethod().get().isAnnotationPresent(DBUser.class)
                 || Arrays.stream(extensionContext.getRequiredTestClass().getDeclaredMethods())
                 .anyMatch(method -> method.isAnnotationPresent(BeforeEach.class)
-                && method.isAnnotationPresent(DBUser.class));
+                        && method.isAnnotationPresent(DBUser.class));
+
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+        String authUserEntityKey = USER_KEY + "authUserEntity";
+
         return extensionContext.getStore(DBUserExtension.NAMESPACE)
-                .get(extensionContext.getUniqueId(), AuthUserEntity.class);
+                .get(authUserEntityKey, AuthUserEntity.class);
     }
 
     @Override
     public void afterEach(ExtensionContext extensionContext) throws Exception {
-        AuthUserEntity user = extensionContext.getStore(DBUserExtension.NAMESPACE)
-                .get(extensionContext.getUniqueId(), AuthUserEntity.class);
+        AuthDAO authDao = new AuthDAOHibernate();
+        UserDataDAO userDataDAO = new UserDataDAOHibernate();
 
-        userDataDAO.deleteUserByUsernameInUserData(user.getUsername());
-        authDao.deleteUserByIdInAuth(user.getId());
+        String authUserEntityKey = USER_KEY + "authUserEntity";
+        String userDataUserEntityKey = USER_KEY + "userDataUserEntity";
+
+        AuthUserEntity authUserEntity = extensionContext.getStore(DBUserExtension.NAMESPACE)
+                .get(authUserEntityKey, AuthUserEntity.class);
+
+        UserDataUserEntity userDataUserEntity = extensionContext.getStore(NAMESPACE)
+                .get(userDataUserEntityKey, UserDataUserEntity.class);
+
+
+        userDataDAO.deleteUserInUserData(userDataUserEntity);
+        authDao.deleteUserInAuth(authUserEntity);
     }
 
     private AuthUserEntity createAuthUserEntity(DBUser dbUser) {
@@ -78,10 +96,21 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
                 .map(authority -> {
                     AuthAuthorityEntity authAuthorityEntity = new AuthAuthorityEntity();
                     authAuthorityEntity.setAuthority(authority);
+                    authAuthorityEntity.setUser(authUserEntity);
                     return authAuthorityEntity;
                 }).toList());
 
         return authUserEntity;
+    }
+
+    private UserDataUserEntity createUserDataUserEntity(AuthUserEntity authUserEntity) {
+
+        UserDataUserEntity userDataUserEntity = new UserDataUserEntity();
+
+        userDataUserEntity.setUsername(authUserEntity.getUsername());
+        userDataUserEntity.setCurrency(CurrencyValues.EUR);
+
+        return userDataUserEntity;
     }
 
     private DBUser getDbUserAnnotation(ExtensionContext extensionContext) {
@@ -99,8 +128,11 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
                 .orElse(null);
     }
 
-    private void persistUserEntity(AuthUserEntity authUserEntity) {
+    private void persistUserEntity(AuthUserEntity authUserEntity, UserDataUserEntity userDataUserEntity) {
+        AuthDAO authDao = new AuthDAOHibernate();
+        UserDataDAO userDataDAO = new UserDataDAOHibernate();
+
         authDao.createUserInAuth(authUserEntity);
-        userDataDAO.createUserInUserData(authUserEntity);
+        userDataDAO.createUserInUserData(userDataUserEntity);
     }
 }

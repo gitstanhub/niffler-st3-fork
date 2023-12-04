@@ -1,15 +1,14 @@
 package guru.qa.niffler.db.dao;
 
-import guru.qa.niffler.db.model.AuthUserEntity;
-import guru.qa.niffler.db.model.UserDataUserEntity;
+import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
 
 public interface UserDataDAO {
 
-    int createUserInUserData(AuthUserEntity user);
+    int createUserInUserData(UserDataUserEntity user);
 
     UserDataUserEntity getUserByUsernameFromUserData(String username);
 
-    void updateUserInUserData(UserDataUserEntity user);
+    UserDataUserEntity updateUserInUserData(UserDataUserEntity user);
 
-    void deleteUserByUsernameInUserData(String username);
+    void deleteUserInUserData(UserDataUserEntity user);
 }

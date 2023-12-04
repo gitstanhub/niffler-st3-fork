@@ -1,6 +1,6 @@
-package guru.qa.niffler.test;
+package guru.qa.niffler.tests;
 
-import guru.qa.niffler.db.model.AuthUserEntity;
+import guru.qa.niffler.db.model.auth.AuthUserEntity;
 import guru.qa.niffler.jupiter.annotation.DBUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
