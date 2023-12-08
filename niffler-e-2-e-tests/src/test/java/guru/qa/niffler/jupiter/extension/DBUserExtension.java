@@ -21,25 +21,24 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
     public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
     private static final String USER_KEY = "context_user_";
 
+    AuthUserEntity authUserEntity;
+    UserDataUserEntity userDataUserEntity;
+
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
         String authUserEntityKey = USER_KEY + "authUserEntity";
         String userDataUserEntityKey = USER_KEY + "userDataUserEntity";
 
-        AuthUserEntity authUserEntity = extensionContext.getStore(NAMESPACE).get(authUserEntityKey, AuthUserEntity.class);
-        UserDataUserEntity userDataUserEntity = extensionContext.getStore(NAMESPACE).get(userDataUserEntityKey, UserDataUserEntity.class);
+        DBUser dbUserAnnotation = getDbUserAnnotation(extensionContext);
+        if (dbUserAnnotation != null) {
+            authUserEntity = createAuthUserEntity(dbUserAnnotation);
+            userDataUserEntity = createUserDataUserEntity(authUserEntity);
 
-        if (authUserEntity == null && userDataUserEntity == null) {
-            DBUser dbUserAnnotation = getDbUserAnnotation(extensionContext);
-            if (dbUserAnnotation != null) {
-                authUserEntity = createAuthUserEntity(dbUserAnnotation);
-                userDataUserEntity = createUserDataUserEntity(authUserEntity);
-
-                persistUserEntity(authUserEntity, userDataUserEntity);
-                extensionContext.getStore(NAMESPACE).put(authUserEntityKey, authUserEntity);
-                extensionContext.getStore(NAMESPACE).put(userDataUserEntityKey, userDataUserEntity);
-            }
+            persistUserEntity(authUserEntity, userDataUserEntity);
+            extensionContext.getStore(NAMESPACE).put(authUserEntityKey, authUserEntity);
+            extensionContext.getStore(NAMESPACE).put(userDataUserEntityKey, userDataUserEntity);
         }
+//        }
     }
 
     @Override
