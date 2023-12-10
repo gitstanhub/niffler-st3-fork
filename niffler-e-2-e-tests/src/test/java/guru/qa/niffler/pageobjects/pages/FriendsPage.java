@@ -1,4 +1,4 @@
-package guru.qa.niffler.page;
+package guru.qa.niffler.pageobjects.pages;
 
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;

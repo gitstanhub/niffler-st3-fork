@@ -1,13 +1,14 @@
-package guru.qa.niffler.tests;
+package guru.qa.niffler.tests.mainpage;
 
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.Spend;
 import guru.qa.niffler.jupiter.annotation.User;
-import guru.qa.niffler.model.CurrencyValues;
-import guru.qa.niffler.model.SpendJson;
-import guru.qa.niffler.model.UserJson;
-import guru.qa.niffler.page.WelcomePage;
+import guru.qa.niffler.api.model.CurrencyValues;
+import guru.qa.niffler.api.model.SpendJson;
+import guru.qa.niffler.api.model.UserJson;
+import guru.qa.niffler.pageobjects.pages.WelcomePage;
+import guru.qa.niffler.tests.base.BaseWebTest;
 import io.qameta.allure.Allure;
 import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,11 +1,11 @@
-package guru.qa.niffler.tests;
+package guru.qa.niffler.tests.base;
 
-import guru.qa.niffler.components.HeaderComponent;
+import guru.qa.niffler.pageobjects.components.HeaderComponent;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.WebTest;
-import guru.qa.niffler.page.FriendsPage;
-import guru.qa.niffler.page.LoginPage;
-import guru.qa.niffler.page.PeoplePage;
+import guru.qa.niffler.pageobjects.pages.FriendsPage;
+import guru.qa.niffler.pageobjects.pages.LoginPage;
+import guru.qa.niffler.pageobjects.pages.PeoplePage;
 
 @WebTest
 public abstract class BaseWebTest {

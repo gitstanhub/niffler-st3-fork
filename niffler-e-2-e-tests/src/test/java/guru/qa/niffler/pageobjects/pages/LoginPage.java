@@ -1,8 +1,8 @@
-package guru.qa.niffler.page;
+package guru.qa.niffler.pageobjects.pages;
 
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.db.model.auth.AuthUserEntity;
-import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.api.model.UserJson;
 import io.qameta.allure.Step;
 
 import static com.codeborne.selenide.Condition.visible;

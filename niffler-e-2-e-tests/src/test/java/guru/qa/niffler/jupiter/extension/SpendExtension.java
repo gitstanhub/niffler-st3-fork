@@ -2,7 +2,7 @@ package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.api.SpendServiceClient;
 import guru.qa.niffler.jupiter.annotation.Spend;
-import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.api.model.SpendJson;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;

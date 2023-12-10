@@ -1,4 +1,4 @@
-package guru.qa.niffler.components;
+package guru.qa.niffler.pageobjects.components;
 
 import io.qameta.allure.Step;
 

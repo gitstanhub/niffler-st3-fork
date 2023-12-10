@@ -1,7 +1,8 @@
-package guru.qa.niffler.tests;
+package guru.qa.niffler.tests.friends;
 
 import guru.qa.niffler.jupiter.annotation.User;
-import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.api.model.UserJson;
+import guru.qa.niffler.tests.base.BaseWebTest;
 import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 
