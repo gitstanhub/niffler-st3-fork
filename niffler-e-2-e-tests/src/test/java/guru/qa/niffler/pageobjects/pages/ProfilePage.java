@@ -1,8 +1,10 @@
 package guru.qa.niffler.pageobjects.pages;
 
+import com.codeborne.selenide.Condition;
 import io.qameta.allure.Step;
 
 import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
 import static guru.qa.niffler.locators.pagelocators.ProfilePageLocators.*;
 
 public class ProfilePage {
@@ -24,7 +26,7 @@ public class ProfilePage {
     @Step
     public ProfilePage selectCurrency(String currency) {
         $(CURRENCY_DROPDOWN).click();
-        $(CURRENCY_DROPDOWN).selectOptionByValue(currency);
+        $$(CURRENCY_DROPDOWN_OPTION).findBy(Condition.text(currency)).click();
 
         return this;
     }
@@ -48,5 +50,20 @@ public class ProfilePage {
         $(CREATE_CATEGORY_BUTTON).click();
 
         return this;
+    }
+
+    @Step
+    public void verifyNameFieldContains(String firstName) {
+        $(FIRST_NAME_FIELD).getValue().contains(firstName);
+    }
+
+    @Step
+    public void verifySurnameFieldContains(String lastName) {
+        $(SURNAME_FIELD).getValue().contains(lastName);
+    }
+
+    @Step
+    public void verifyCurrencyIsSelected(String currency) {
+        $(CURRENCY_DROPDOWN).shouldHave(Condition.exactText(currency));
     }
 }
