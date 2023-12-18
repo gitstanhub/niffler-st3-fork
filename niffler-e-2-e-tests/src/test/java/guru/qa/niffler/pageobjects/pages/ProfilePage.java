@@ -87,4 +87,9 @@ public class ProfilePage {
 
         return this;
     }
+
+    @Step
+    public void verifyProfileUploadCancelNotVisible() {
+        $(PROFILE_PICTURE_CANCEL_UPLOAD_BUTTON).shouldNot(Condition.visible);
+    }
 }

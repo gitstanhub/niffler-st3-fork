@@ -56,7 +56,8 @@ public class ProfileTest extends BaseWebTest {
     @DBUser
     @Test
     void profilePictureCanBeUpdated(AuthUserEntity user) {
-        File profilePictureFile = new File("niffler-e-2-e-tests/src/test/resources/uploadimages/profile_picture.png");
+        String resourcePath = getClass().getClassLoader().getResource("uploadimages/profile_picture.png").getFile();
+        File profilePictureFile = new File(resourcePath);
 
         loginPage.logInWithUser(user);
 
@@ -67,6 +68,6 @@ public class ProfileTest extends BaseWebTest {
                 .uploadProfilePicture(profilePictureFile)
                 .clickSubmitButton();
 
-        System.out.println("test");
+        profilePage.verifyProfileUploadCancelNotVisible();
     }
 }

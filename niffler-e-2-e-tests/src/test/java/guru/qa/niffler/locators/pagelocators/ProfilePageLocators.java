@@ -12,4 +12,5 @@ public class ProfilePageLocators {
     public static final String CATEGORY_ITEM = "[class='main-content__section-categories'] li";
     public static final String PROFILE_PICTURE_AREA = "div [class='profile__avatar-edit']";
     public static final String PROFILE_PICTURE_UPLOAD_BUTTON = "input[class='edit-avatar__input']";
+    public static final String PROFILE_PICTURE_CANCEL_UPLOAD_BUTTON = "span[class='edit-avatar__close']";
 }
