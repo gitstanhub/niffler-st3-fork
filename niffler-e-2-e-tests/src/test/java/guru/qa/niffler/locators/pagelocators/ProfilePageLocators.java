@@ -9,5 +9,7 @@ public class ProfilePageLocators {
     public static final String SUBMIT_BUTTON = "button[type='submit']";
     public static final String CATEGORY_FIELD = "input[name='category']";
     public static final String CREATE_CATEGORY_BUTTON = "div[class='add-category__input-container'] button";
-
+    public static final String CATEGORY_ITEM = "[class='main-content__section-categories'] li";
+    public static final String PROFILE_PICTURE_AREA = "div [class='profile__avatar-edit']";
+    public static final String PROFILE_PICTURE_UPLOAD_BUTTON = "input[class='edit-avatar__input']";
 }

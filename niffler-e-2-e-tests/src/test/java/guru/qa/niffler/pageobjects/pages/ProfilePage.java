@@ -3,6 +3,8 @@ package guru.qa.niffler.pageobjects.pages;
 import com.codeborne.selenide.Condition;
 import io.qameta.allure.Step;
 
+import java.io.File;
+
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 import static guru.qa.niffler.locators.pagelocators.ProfilePageLocators.*;
@@ -65,5 +67,24 @@ public class ProfilePage {
     @Step
     public void verifyCurrencyIsSelected(String currency) {
         $(CURRENCY_DROPDOWN).shouldHave(Condition.exactText(currency));
+    }
+
+    @Step
+    public void verifyCategoryVisible(String categoryName) {
+        $$(CATEGORY_ITEM).findBy(Condition.exactText(categoryName)).shouldBe(Condition.visible);
+    }
+
+    @Step
+    public ProfilePage clickProfilePictureArea() {
+        $(PROFILE_PICTURE_AREA).click();
+
+        return this;
+    }
+
+    @Step
+    public ProfilePage uploadProfilePicture(File profilePictureFile) {
+        $(PROFILE_PICTURE_UPLOAD_BUTTON).uploadFile(profilePictureFile);
+
+        return this;
     }
 }
