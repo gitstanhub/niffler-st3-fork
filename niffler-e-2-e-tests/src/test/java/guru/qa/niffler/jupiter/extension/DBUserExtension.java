@@ -38,7 +38,6 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
             extensionContext.getStore(NAMESPACE).put(authUserEntityKey, authUserEntity);
             extensionContext.getStore(NAMESPACE).put(userDataUserEntityKey, userDataUserEntity);
         }
-//        }
     }
 
     @Override

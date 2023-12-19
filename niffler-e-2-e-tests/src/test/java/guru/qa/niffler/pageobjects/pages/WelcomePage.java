@@ -1,18 +1,32 @@
 package guru.qa.niffler.pageobjects.pages;
 
-import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.Selenide;
+import io.qameta.allure.Step;
 
 import static com.codeborne.selenide.Selenide.$;
+import static guru.qa.niffler.locators.pagelocators.WelcomePageLocators.LOGIN_BUTTON;
+import static guru.qa.niffler.locators.pagelocators.WelcomePageLocators.REGISTER_BUTTON;
 
 public class WelcomePage {
 
-    public static final String pageUrl = "/welcome";
+    @Step
+    public WelcomePage openWelcomePage() {
+            Selenide.open("http://127.0.0.1:3000/main");
 
-    private final SelenideElement loginBtn = $("a[href*='redirect']");
-    private final SelenideElement registerBtn = $("a[href*='register']");
+            return this;
+    }
 
-    public LoginPage goToLoginPage() {
-        loginBtn.click();
-        return new LoginPage();
+    @Step
+    public WelcomePage clickLoginButton() {
+        $(LOGIN_BUTTON).click();
+
+        return this;
+    }
+
+    @Step
+    public WelcomePage clickRegisterButton() {
+        $(REGISTER_BUTTON).click();
+
+        return this;
     }
 }

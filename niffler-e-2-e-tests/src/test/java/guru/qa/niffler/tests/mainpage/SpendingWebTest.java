@@ -26,7 +26,7 @@ public class SpendingWebTest extends BaseWebTest {
     @BeforeEach
     void doLogin(@User(userType = WITH_FRIENDS) UserJson userForTest) {
         WelcomePage welcomePage = Selenide.open("http://127.0.0.1:3000/main", WelcomePage.class);
-        welcomePage.goToLoginPage();
+        welcomePage.clickLoginButton();
         $("input[name='username']").setValue(userForTest.getUsername());
         $("input[name='password']").setValue(userForTest.getPassword());
         $("button[type='submit']").click();

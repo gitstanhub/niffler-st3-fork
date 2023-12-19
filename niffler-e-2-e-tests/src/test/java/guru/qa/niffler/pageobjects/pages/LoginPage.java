@@ -10,9 +10,11 @@ import static com.codeborne.selenide.Selenide.$;
 
 public class LoginPage {
 
+    WelcomePage welcomePage = new WelcomePage();
+
     @Step
     public LoginPage logInWithUser(UserJson userJson) {
-        open();
+        welcomePage.openWelcomePage();
         fillInForm(userJson);
         clickSignInButton();
         return this;
@@ -20,7 +22,7 @@ public class LoginPage {
 
     @Step
     public LoginPage logInWithUser(AuthUserEntity user) {
-        open();
+        welcomePage.openWelcomePage();
         fillInForm(user);
         clickSignInButton();
         return this;
@@ -31,10 +33,10 @@ public class LoginPage {
         $(".main-content__section-stats").should(visible);
     }
 
-    private void open() {
-        Selenide.open("http://127.0.0.1:3000/main");
-        $("a[href*='redirect']").click();
-    }
+//    private void open() {
+//        Selenide.open("http://127.0.0.1:3000/main");
+//        $("a[href*='redirect']").click();
+//    }
 
     private void fillInForm(AuthUserEntity user) {
         $("input[name='username']").setValue(user.getUsername());
