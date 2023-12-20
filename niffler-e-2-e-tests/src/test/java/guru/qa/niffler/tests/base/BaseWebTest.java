@@ -15,6 +15,7 @@ public abstract class BaseWebTest {
     protected HeaderComponent headerComponent = new HeaderComponent();
     protected ProfilePage profilePage = new ProfilePage();
     protected RegistrationPage registrationPage = new RegistrationPage();
+    protected MainPage mainPage = new MainPage();
 
     protected static final Config CFG = Config.getInstance();
 }

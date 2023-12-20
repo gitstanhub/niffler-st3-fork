@@ -14,7 +14,10 @@ public class LoginPage {
 
     @Step
     public LoginPage logInWithUser(UserJson userJson) {
-        welcomePage.openWelcomePage();
+        welcomePage
+                .openWelcomePage()
+                .clickLoginButton();
+
         fillInForm(userJson);
         clickSignInButton();
         return this;
@@ -22,7 +25,10 @@ public class LoginPage {
 
     @Step
     public LoginPage logInWithUser(AuthUserEntity user) {
-        welcomePage.openWelcomePage();
+        welcomePage
+                .openWelcomePage()
+                .clickLoginButton();
+
         fillInForm(user);
         clickSignInButton();
         return this;
