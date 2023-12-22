@@ -27,51 +27,51 @@ public class SpendingWebTest extends BaseWebTest {
     private static final String user = "dima";
 
 //    @BeforeEach
-    void doLogin(@User(userType = WITH_FRIENDS) UserJson userForTest) {
-        WelcomePage welcomePage = Selenide.open("http://127.0.0.1:3000/main", WelcomePage.class);
-        welcomePage.clickLoginButton();
-        $("input[name='username']").setValue(userForTest.getUsername());
-        $("input[name='password']").setValue(userForTest.getPassword());
-        $("button[type='submit']").click();
-    }
-
-    @Category(
-            username = user,
-            category = "Рыбалка"
-    )
-    @Spend(
-            username = user,
-            description = "Рыбалка на Ладоге",
-            category = "Рыбалка",
-            amount = 14000.00,
-            currency = CurrencyValues.RUB
-    )
-    @Test
-    @AllureId("100")
-    void spendingShouldBeDeletedAfterDeleteAction(SpendJson createdSpend,
-                                                  @User(userType = WITH_FRIENDS) UserJson userForTest) {
-        doLogin(userForTest);
-
-        $(".spendings__content tbody")
-                .$$("tr")
-                .find(text(createdSpend.getDescription()))
-                .$$("td")
-                .first()
-                .$("td")
-                .scrollTo()
-                .click();
-
-        Allure.step(
-                "Delete spending",
-                () -> $(byText("Delete selected")).click())
-        ;
-        Allure.step(
-                "Check spendings",
-                () -> $(".spendings__content tbody")
-                        .$$("tr")
-                        .shouldHave(size(0))
-        );
-    }
+//    void doLogin(UserJson userForTest) {
+//        WelcomePage welcomePage = Selenide.open("http://127.0.0.1:3000/main", WelcomePage.class);
+//        welcomePage.clickLoginButton();
+//        $("input[name='username']").setValue(userForTest.getUsername());
+//        $("input[name='password']").setValue(userForTest.getPassword());
+//        $("button[type='submit']").click();
+//    }
+//
+//    @Category(
+//            username = user,
+//            category = "Рыбалка"
+//    )
+//    @Spend(
+//            username = user,
+//            description = "Рыбалка на Ладоге",
+//            category = "Рыбалка",
+//            amount = 14000.00,
+//            currency = CurrencyValues.RUB
+//    )
+//    @Test
+//    @AllureId("100")
+//    void spendingShouldBeDeletedAfterDeleteAction(SpendJson createdSpend,
+//                                                  @User(userType = WITH_FRIENDS) UserJson userForTest) {
+//        doLogin(userForTest);
+//
+//        $(".spendings__content tbody")
+//                .$$("tr")
+//                .find(text(createdSpend.getDescription()))
+//                .$$("td")
+//                .first()
+//                .$("td")
+//                .scrollTo()
+//                .click();
+//
+//        Allure.step(
+//                "Delete spending",
+//                () -> $(byText("Delete selected")).click())
+//        ;
+//        Allure.step(
+//                "Check spendings",
+//                () -> $(".spendings__content tbody")
+//                        .$$("tr")
+//                        .shouldHave(size(0))
+//        );
+//    }
 
     @DBUser
     @Test

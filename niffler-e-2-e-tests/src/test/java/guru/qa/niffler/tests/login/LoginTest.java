@@ -21,4 +21,17 @@ public class LoginTest extends BaseWebTest {
                 .logInWithUser(user)
                 .verifyStatsSectionIsVisible();
     }
+
+    @DBUser
+    @Test
+    void userCanLogOutAfterLogIn(AuthUserEntity user) {
+        loginPage
+                .logInWithUser(user);
+
+        headerComponent
+                .clickLogoutButton();
+
+        welcomePage
+                .verifyWelcomeSplashIsDisplayed();
+    }
 }

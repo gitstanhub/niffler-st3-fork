@@ -10,18 +10,28 @@ public class HeaderComponent {
     @Step
     public HeaderComponent clickFriendsButton() {
         $(FRIENDS_BUTTON).click();
+
         return this;
     }
 
     @Step
     public HeaderComponent clickPeopleButton() {
         $(PEOPLE_BUTTON).click();
+
         return this;
     }
 
     @Step
     public HeaderComponent clickProfileButton() {
         $(PROFILE_BUTTON).click();
+
+        return this;
+    }
+
+    @Step
+    public HeaderComponent clickLogoutButton() {
+        $(LOGOUT_BUTTON).click();
+
         return this;
     }
 }
