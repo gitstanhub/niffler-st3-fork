@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AuthAndUserDataDAOJdbc implements AuthDAO, UserDataDAO {
+public class AuthUsersAndUserDataUsersDAOJdbc implements AuthUsersDAO, UserDataUsersDAO {
 
     private static DataSource authDs = DataSourceProvider.INSTANCE.getDataSource(ServiceDB.AUTH);
     private static DataSource userdataDs = DataSourceProvider.INSTANCE.getDataSource(ServiceDB.USERDATA);

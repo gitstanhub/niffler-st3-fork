@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.UUID;
 
-public interface AuthDAO {
+public interface AuthUsersDAO {
 
     PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 

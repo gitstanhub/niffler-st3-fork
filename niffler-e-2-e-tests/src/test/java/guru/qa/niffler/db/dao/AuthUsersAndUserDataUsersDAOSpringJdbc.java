@@ -24,14 +24,14 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.UUID;
 
-public class AuthAndUserDataDAOSpringJdbc implements AuthDAO, UserDataDAO {
+public class AuthUsersAndUserDataUsersDAOSpringJdbc implements AuthUsersDAO, UserDataUsersDAO {
 
     private final TransactionTemplate authTemplate;
     private final TransactionTemplate userdataTemplate;
     private final JdbcTemplate authJdbcTemplate;
     private final JdbcTemplate userdataJdbcTemplate;
 
-    public AuthAndUserDataDAOSpringJdbc() {
+    public AuthUsersAndUserDataUsersDAOSpringJdbc() {
         JdbcTransactionManager authTm = new JdbcTransactionManager(
                 DataSourceProvider.INSTANCE.getDataSource(ServiceDB.AUTH));
         JdbcTransactionManager userdataTm = new JdbcTransactionManager(

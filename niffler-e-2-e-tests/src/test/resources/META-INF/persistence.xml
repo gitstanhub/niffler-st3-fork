@@ -6,5 +6,6 @@
         <class>guru.qa.niffler.db.model.auth.AuthUserEntity</class>
         <class>guru.qa.niffler.db.model.auth.AuthAuthorityEntity</class>
         <class>guru.qa.niffler.db.model.userdata.UserDataUserEntity</class>
+        <class>guru.qa.niffler.db.model.userdata.FriendsEntity</class>
     </persistence-unit>
 </persistence>

@@ -7,6 +7,7 @@ import guru.qa.niffler.db.model.auth.AuthAuthorityEntity;
 import guru.qa.niffler.db.model.auth.AuthUserEntity;
 import guru.qa.niffler.db.model.auth.Authority;
 import guru.qa.niffler.db.model.userdata.CurrencyValues;
+import guru.qa.niffler.db.model.userdata.FriendsEntity;
 import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
 
 import guru.qa.niffler.jupiter.annotation.DBUser;
@@ -63,8 +64,9 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
 
     @Override
     public void afterEach(ExtensionContext extensionContext) throws Exception {
-        AuthDAO authDao = new AuthDAOHibernate();
-        UserDataDAO userDataDAO = new UserDataDAOHibernate();
+        AuthUsersDAO authUsersDao = new AuthUsersDAOHibernate();
+        UserDataUsersDAO userDataUsersDAO = new UserDataUsersDAOHibernate();
+        UserDataFriendsDAO userDataFriendsDAO = new UserDataFriendsDAOHibernate();
 
         String authUserEntityKey = USER_KEY + "authUserEntity";
         String userDataUserEntityKey = USER_KEY + "userDataUserEntity";
@@ -75,9 +77,14 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
         UserDataUserEntity userDataUserEntity = extensionContext.getStore(NAMESPACE)
                 .get(userDataUserEntityKey, UserDataUserEntity.class);
 
+        FriendsEntity friendsEntity = userDataFriendsDAO.getFriendRequestByFriendId(userDataUserEntity.getId());
 
-        userDataDAO.deleteUserInUserData(userDataUserEntity);
-        authDao.deleteUserInAuth(authUserEntity);
+        if (friendsEntity != null) {
+            userDataFriendsDAO.deleteFriendRequestInUserData(friendsEntity);
+        }
+
+        userDataUsersDAO.deleteUserInUserData(userDataUserEntity);
+        authUsersDao.deleteUserInAuth(authUserEntity);
     }
 
     private AuthUserEntity createAuthUserEntity(DBUser dbUser) {
@@ -127,10 +134,10 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
     }
 
     private void persistUserEntity(AuthUserEntity authUserEntity, UserDataUserEntity userDataUserEntity) {
-        AuthDAO authDao = new AuthDAOHibernate();
-        UserDataDAO userDataDAO = new UserDataDAOHibernate();
+        AuthUsersDAO authUsersDao = new AuthUsersDAOHibernate();
+        UserDataUsersDAO userDataUsersDAO = new UserDataUsersDAOHibernate();
 
-        authDao.createUserInAuth(authUserEntity);
-        userDataDAO.createUserInUserData(userDataUserEntity);
+        authUsersDao.createUserInAuth(authUserEntity);
+        userDataUsersDAO.createUserInUserData(userDataUserEntity);
     }
 }

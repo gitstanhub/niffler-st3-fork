@@ -2,7 +2,7 @@ package guru.qa.niffler.db.dao;
 
 import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
 
-public interface UserDataDAO {
+public interface UserDataUsersDAO {
 
     int createUserInUserData(UserDataUserEntity user);
 

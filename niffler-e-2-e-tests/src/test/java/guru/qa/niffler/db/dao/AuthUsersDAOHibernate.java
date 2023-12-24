@@ -7,9 +7,9 @@ import guru.qa.niffler.db.model.auth.AuthUserEntity;
 
 import java.util.UUID;
 
-public class AuthDAOHibernate extends JpaService implements AuthDAO {
+public class AuthUsersDAOHibernate extends JpaService implements AuthUsersDAO {
 
-    public AuthDAOHibernate() {
+    public AuthUsersDAOHibernate() {
         super(EntityManagerFactoryProvider.INSTANCE.getDataSource(ServiceDB.AUTH).createEntityManager());
     }
 
