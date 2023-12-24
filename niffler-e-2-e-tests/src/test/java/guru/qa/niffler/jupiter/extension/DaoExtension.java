@@ -12,18 +12,18 @@ public class DaoExtension implements TestInstancePostProcessor {
     @Override
     public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
         for (Field field : testInstance.getClass().getDeclaredFields()) {
-            if ((field.getType().isAssignableFrom(AuthDAO.class) || field.getType().isAssignableFrom(UserDataDAO.class))
+            if ((field.getType().isAssignableFrom(AuthUsersDAO.class) || field.getType().isAssignableFrom(UserDataUsersDAO.class))
                     && field.isAnnotationPresent(Dao.class)) {
                 field.setAccessible(true);
 
-                AuthDAO dao;
+                AuthUsersDAO dao;
 
                 if ("hibernate".equals(System.getProperty("db.impl"))) {
-                    dao = new AuthDAOHibernate();
+                    dao = new AuthUsersDAOHibernate();
                 } else if ("spring".equals(System.getProperty("db.impl"))) {
-                    dao = new AuthAndUserDataDAOSpringJdbc();
+                    dao = new AuthUsersAndUserDataUsersDAOSpringJdbc();
                 } else {
-                    dao = new AuthAndUserDataDAOSpringJdbc();
+                    dao = new AuthUsersAndUserDataUsersDAOSpringJdbc();
                 }
 
                 field.set(testInstance, dao);

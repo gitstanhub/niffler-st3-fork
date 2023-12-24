@@ -1,7 +1,7 @@
 package guru.qa.niffler.api;
 
-import guru.qa.niffler.model.CategoryJson;
-import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.api.model.CategoryJson;
+import guru.qa.niffler.api.model.SpendJson;
 import io.qameta.allure.Step;
 
 import java.io.IOException;
