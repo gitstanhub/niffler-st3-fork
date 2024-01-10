@@ -13,7 +13,7 @@ public class ProfileTest extends BaseWebTest {
     Faker faker = new Faker();
 
     @DBUser
-            (username = "stanislav_three",
+            (username = "stanislav_four",
                     password = "123456"
             )
     @Test
