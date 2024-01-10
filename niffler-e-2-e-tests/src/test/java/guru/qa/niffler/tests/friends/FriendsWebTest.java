@@ -9,10 +9,12 @@ import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static com.codeborne.selenide.Selenide.$;
 import static guru.qa.niffler.jupiter.annotation.User.UserType.WITH_FRIENDS;
 
+//@Execution(ExecutionMode.SAME_THREAD)
 public class FriendsWebTest extends BaseWebTest {
 
 //    @BeforeEach
@@ -27,6 +29,7 @@ public class FriendsWebTest extends BaseWebTest {
     @Disabled
     @Test
     @AllureId("101")
+    @ResourceLock("lock")
     void friendShouldBeDisplayedInTable0(@User(userType = WITH_FRIENDS) UserJson userForTest) throws InterruptedException {
         Thread.sleep(3000);
     }
