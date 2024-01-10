@@ -10,6 +10,8 @@ import guru.qa.niffler.db.model.userdata.CurrencyValues;
 import guru.qa.niffler.db.model.userdata.FriendsEntity;
 import guru.qa.niffler.db.model.userdata.UserDataUserEntity;
 
+import guru.qa.niffler.db.repository.UserRepository;
+import guru.qa.niffler.db.repository.UserRepositoryHibernate;
 import guru.qa.niffler.jupiter.annotation.DBUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.*;
@@ -24,6 +26,8 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
 
     AuthUserEntity authUserEntity;
     UserDataUserEntity userDataUserEntity;
+
+    private UserRepository userRepository = new UserRepositoryHibernate();
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
@@ -137,7 +141,9 @@ public class DBUserExtension implements BeforeEachCallback, AfterEachCallback, P
         AuthUsersDAO authUsersDao = new AuthUsersDAOHibernate();
         UserDataUsersDAO userDataUsersDAO = new UserDataUsersDAOHibernate();
 
-        authUsersDao.createUserInAuth(authUserEntity);
-        userDataUsersDAO.createUserInUserData(userDataUserEntity);
+//        authUsersDao.createUserInAuth(authUserEntity);
+//        userDataUsersDAO.createUserInUserData(userDataUserEntity);
+
+        userRepository.createUserForTest(authUserEntity);
     }
 }
