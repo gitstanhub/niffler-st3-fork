@@ -12,6 +12,7 @@ public class ProfileTest extends BaseWebTest {
 
     Faker faker = new Faker();
 
+//    @ApiLogin
     @DBUser
             (username = "stanislav_four",
                     password = "123456"
